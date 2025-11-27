@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/sidebar";
 import {
   Home,
+  UserCheck,
   Users,
   Settings,
   LogOut,
@@ -31,6 +32,11 @@ const menuItems = [
     icon: Home,
   },
   {
+    title: "active",
+    url: "/active",
+    icon: UserCheck,
+  },
+  {
     title: "Users",
     url: "/users",
     icon: Users,
@@ -41,7 +47,7 @@ const menuItems = [
     icon: ShoppingCart,
   },
   {
-    title: "Wallet",
+    title: "Advance Salary",
     url: "/wallet",
     icon: Wallet,
   },
