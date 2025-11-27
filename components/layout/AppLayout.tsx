@@ -26,6 +26,7 @@ import {
   Clock,
   FolderOpen,
   RefreshCw,
+  DollarSign,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -64,6 +65,11 @@ const menuItems = [
     title: "Change Shift",
     url: "/change-shift",
     icon: RefreshCw,
+  },
+  {
+    title: "Loan & Advance",
+    url: "/loan-advance",
+    icon: DollarSign,
   },
   {
     title: "Products",
