@@ -22,6 +22,7 @@ import {
   LogOut,
   ShoppingCart,
   Wallet,
+  Calendar,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -40,6 +41,11 @@ const menuItems = [
     title: "Users",
     url: "/users",
     icon: Users,
+  },
+  {
+    title: "Leave",
+    url: "/Leave",
+    icon: Calendar,
   },
   {
     title: "Products",
