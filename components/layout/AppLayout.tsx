@@ -23,6 +23,7 @@ import {
   ShoppingCart,
   Wallet,
   Calendar,
+  Clock,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -46,6 +47,11 @@ const menuItems = [
     title: "Leave",
     url: "/Leave",
     icon: Calendar,
+  },
+  {
+    title: "Overtime",
+    url: "/overtime",
+    icon: Clock,
   },
   {
     title: "Products",
