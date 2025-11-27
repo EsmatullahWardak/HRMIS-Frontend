@@ -24,6 +24,8 @@ import {
   Wallet,
   Calendar,
   Clock,
+  FolderOpen,
+  RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -52,6 +54,16 @@ const menuItems = [
     title: "Overtime",
     url: "/overtime",
     icon: Clock,
+  },
+  {
+    title: "Resources",
+    url: "/resources:",
+    icon: FolderOpen,
+  },
+  {
+    title: "Change Shift",
+    url: "/change-shift",
+    icon: RefreshCw,
   },
   {
     title: "Products",
