@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -30,17 +30,17 @@ export default function RootLayout({
   const router = useRouter();
 
   // Pages that should NOT show the sidebar
-  const authPages = ['/auth/login', '/auth/register'];
+  const authPages = ["/auth/login", "/auth/register"];
   const showSidebar = !authPages.includes(pathname);
 
   useEffect(() => {
     if (showSidebar) {
       if (!isAuthenticated()) {
-        router.push('/auth/login');
+        router.push("/auth/login");
         return;
       }
 
-      const userData = localStorage.getItem('user');
+      const userData = localStorage.getItem("user");
       if (userData) {
         setCurrentUser(JSON.parse(userData));
       }
@@ -51,15 +51,17 @@ export default function RootLayout({
   const handleLogout = () => {
     logout();
     setCurrentUser(null);
-    router.push('/auth/login');
+    router.push("/auth/login");
   };
 
   if (loading && showSidebar) {
     return (
-      <html lang="en">
-        <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <div className="flex items-center justify-center min-h-screen">
-            <p className="text-lg">Loading...</p>
+      <html lang='en'>
+        <body
+          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        >
+          <div className='flex items-center justify-center min-h-screen'>
+            <p className='text-lg'>Loading...</p>
           </div>
         </body>
       </html>
@@ -67,19 +69,19 @@ export default function RootLayout({
   }
 
   return (
-    <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+    <html lang='en' suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         {showSidebar ? (
           <SidebarProvider>
-            <div className="flex h-screen w-full">
+            <div className='flex h-screen w-full'>
               <AppSidebar currentUser={currentUser} onLogout={handleLogout} />
-              <main className="flex-1 flex flex-col overflow-hidden">
-                <header className="border-b p-4">
+              <main className='flex-1 flex flex-col overflow-hidden'>
+                <header className='border-b p-4'>
                   <SidebarTrigger />
                 </header>
-                <div className="flex-1 overflow-auto p-6">
-                  {children}
-                </div>
+                <div className='flex-1 overflow-auto p-6'>{children}</div>
               </main>
             </div>
           </SidebarProvider>
