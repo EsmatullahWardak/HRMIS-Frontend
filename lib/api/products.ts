@@ -44,4 +44,30 @@ export const productsApi = {
     });
     return response.data;
   },
+
+  // Update a product
+  updateProduct: async (
+    id: number,
+    data: CreateProductDto
+  ): Promise<Product> => {
+    const token = localStorage.getItem("auth_token");
+    const response = await axios.put(`${API_URL}/products/${id}`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+    return response.data;
+  },
+
+  // Delete a product
+  deleteProduct: async (id: number): Promise<Product> => {
+    const token = localStorage.getItem("auth_token");
+    const response = await axios.delete(`${API_URL}/products/${id}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    return response.data;
+  },
 };

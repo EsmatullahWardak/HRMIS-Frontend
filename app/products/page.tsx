@@ -6,6 +6,18 @@ import { Button } from "@/components/ui/button";
 import { isAuthenticated, getUserFromToken } from "@/lib/auth";
 import AddProductModal from "@/components/products/AddProductModal";
 import { productsApi } from "@/lib/api/products";
+import { Pencil, Trash2 } from "lucide-react";
+import EditProductModal from "@/components/products/EditProductModal";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 interface Product {
   id: number;
@@ -24,6 +36,11 @@ export default function ProductsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<Product | null>(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -70,7 +87,37 @@ export default function ProductsPage() {
   const handleProductAdded = () => {
     fetchProducts(); // Refresh the products list
   };
+  const handleProductUpdated = () => {
+    fetchProducts(); // Refresh the products list
+  };
 
+  const handleEditClick = (product: Product) => {
+    setSelectedProduct(product);
+    setIsEditModalOpen(true);
+  };
+
+  const handleDeleteClick = (product: Product) => {
+    setProductToDelete(product);
+    setIsDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!productToDelete) return;
+
+    setDeleteLoading(true);
+    try {
+      await productsApi.deleteProduct(productToDelete.id);
+      console.log("Product deleted successfully");
+      setIsDeleteDialogOpen(false);
+      setProductToDelete(null);
+      fetchProducts(); // Refresh the products list
+    } catch (err) {
+      console.error("Error deleting product:", err);
+      alert("Failed to delete product");
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
   if (loading) {
     return (
       <div className='flex items-center justify-center min-h-screen bg-gray-50'>
@@ -127,6 +174,9 @@ export default function ProductsPage() {
                     <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
                       Status
                     </th>
+                    <th className='px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider'>
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody className='bg-white divide-y divide-gray-200'>
@@ -155,6 +205,26 @@ export default function ProductsPage() {
                           {product.isActive ? "Active" : "Inactive"}
                         </span>
                       </td>
+                      <td className='px-6 py-4 whitespace-nowrap text-sm font-medium'>
+                        <div className='flex items-center gap-2'>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleEditClick(product)}
+                            className='h-8 w-8 p-0'
+                          >
+                            <Pencil className='h-4 w-4 text-blue-600' />
+                          </Button>
+                          <Button
+                            variant='ghost'
+                            size='sm'
+                            onClick={() => handleDeleteClick(product)}
+                            className='h-8 w-8 p-0'
+                          >
+                            <Trash2 className='h-4 w-4 text-red-600' />
+                          </Button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -170,6 +240,42 @@ export default function ProductsPage() {
         onClose={() => setIsAddModalOpen(false)}
         onProductAdded={handleProductAdded}
       />
+
+      {/* Edit Product Modal */}
+      <EditProductModal
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onProductUpdated={handleProductUpdated}
+        product={selectedProduct}
+      />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={isDeleteDialogOpen}
+        onOpenChange={setIsDeleteDialogOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the product "{productToDelete?.name}
+              ". This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleteLoading}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteConfirm}
+              disabled={deleteLoading}
+              className='bg-red-600 hover:bg-red-700'
+            >
+              {deleteLoading ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
