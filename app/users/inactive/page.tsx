@@ -4,29 +4,26 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { isAuthenticated, getUserFromToken, logout } from "@/lib/auth";
-import { getActiveUsers } from "@/api/auth/users/getActiveUsers";
+import { getInactiveUsers } from "@/api/auth/users/getInactiveUsers";
 import { deleteUser } from "@/api/auth/users/deleteUser";
 import UsersTable from "@/components/users/UsersTable";
 import { updateUser } from "@/api/auth/users/updateUser";
 import EditUserModal from "@/components/users/EditUserModal";
-import AddUserModal from "@/components/users/AddUserModal";
 
 interface User {
   id: number;
   name: string | null;
   email: string;
   createdAt: string;
-  is_active: boolean;
 }
 
-export default function HomePage() {
+export default function InactiveUsersPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [editingUser, setEditingUser] = useState<User | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -68,18 +65,10 @@ export default function HomePage() {
     }
   };
 
-  const handleAddUser = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const handleUserAdded = () => {
-    fetchUsers();
-  };
-
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const data = await getActiveUsers();
+      const data = await getInactiveUsers();
       setUsers(data);
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Failed to fetch users";
@@ -89,8 +78,8 @@ export default function HomePage() {
       setLoading(false);
     }
   };
+
   const handleDeleteUser = async (userId: number) => {
-    console.log("Delete button clicked for user:", userId);
     if (confirm("Are you sure you want to delete this user?")) {
       try {
         await deleteUser(userId);
@@ -123,9 +112,7 @@ export default function HomePage() {
       <div className='max-w-6xl mx-auto'>
         <div className='flex justify-between items-center mb-8'>
           <div>
-            <h1 className='text-3xl font-bold text-gray-800'>
-              Welcome, {currentUser?.name || "User"}! 👋
-            </h1>
+            <h1 className='text-3xl font-bold text-gray-800'>Inactive Users</h1>
             <p className='text-gray-600 mt-1'>
               Logged in as: {currentUser?.email}
             </p>
@@ -141,7 +128,6 @@ export default function HomePage() {
           error={error}
           onDeleteUser={handleDeleteUser}
           onEditUser={handleEditUser}
-          onAddUser={handleAddUser}
         />
 
         <EditUserModal
@@ -149,12 +135,6 @@ export default function HomePage() {
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}
           onSave={handleSaveUser}
-        />
-
-        <AddUserModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          onUserAdded={handleUserAdded}
         />
       </div>
     </div>
