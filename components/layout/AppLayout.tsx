@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   Sidebar,
   SidebarContent,
@@ -11,6 +12,9 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarMenuSub,
+  SidebarMenuSubItem,
+  SidebarMenuSubButton,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
@@ -27,10 +31,19 @@ import {
   FolderOpen,
   RefreshCw,
   DollarSign,
+  ChevronDown,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 const menuItems = [
+  {
+    type: "dropdown",
+    label: "Users",
+    items: [
+      { title: "Active", url: "/users/active", icon: UserCheck },
+      { title: "Inactive", url: "/users/inactive", icon: Users },
+    ],
+  },
   {
     title: "Dashboard",
     url: "/",
@@ -81,17 +94,53 @@ const menuItems = [
     url: "/wallet",
     icon: Wallet,
   },
-  {
-    title: "Settings",
-    url: "/settings",
-    icon: Settings,
-  },
 ];
 
 interface AppLayoutProps {
   children: React.ReactNode;
   currentUser?: any;
   onLogout?: () => void;
+}
+
+interface DropdownMenuItemProps {
+  label: string;
+  items: Array<{
+    title: string;
+    url: string;
+    icon?: React.ComponentType<{ className?: string }>;
+  }>;
+}
+
+function DropdownMenuItem({ label, items }: DropdownMenuItemProps) {
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton onClick={() => setIsOpen(!isOpen)}>
+        <Users className='h-4 w-4' />
+        <span>{label}</span>
+        <ChevronDown
+          className={`ml-auto h-4 w-4 transition-transform ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        />
+      </SidebarMenuButton>
+      {isOpen && (
+        <SidebarMenuSub>
+          {items.map((subItem) => (
+            <SidebarMenuSubItem key={subItem.title}>
+              <SidebarMenuSubButton asChild>
+                <a href={subItem.url}>
+                  {subItem.icon && <subItem.icon className='h-4 w-4' />}
+                  <span>{subItem.title}</span>
+                </a>
+              </SidebarMenuSubButton>
+            </SidebarMenuSubItem>
+          ))}
+        </SidebarMenuSub>
+      )}
+    </SidebarMenuItem>
+  );
 }
 
 export function AppSidebar({
@@ -120,16 +169,27 @@ export function AppSidebar({
           <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {menuItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <a href={item.url}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </a>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
+              {menuItems.map((item, index) => {
+                if (item.type === "dropdown") {
+                  return (
+                    <DropdownMenuItem
+                      key={item.label}
+                      label={item.label}
+                      items={item.items}
+                    />
+                  );
+                }
+                return (
+                  <SidebarMenuItem key={item.title || index}>
+                    <SidebarMenuButton asChild>
+                      <a href={item.url}>
+                        {item.icon && <item.icon />}
+                        <span>{item.title}</span>
+                      </a>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                );
+              })}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
