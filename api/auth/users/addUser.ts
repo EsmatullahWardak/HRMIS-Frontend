@@ -3,21 +3,22 @@ import axios from "axios";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export interface User {
-  id: number;
-  name: string | null;
+  name: string;
   email: string;
-  createdAt: string;
+  password: string;
   is_active: boolean;
 }
 
-export const getAllUsers = async () => {
+export const createUser = async (data: User) => {
   try {
-    const response = await axios.get(`${API_URL}/users`);
+    console.log(data);
+    const response = await axios.post(`${API_URL}/users`, data);
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {
       throw new Error(
-        error.response?.data?.message || "Failed to fetch users."
+        error.response?.data?.message ||
+          "Failed to create user. Please try again."
       );
     }
     throw new Error("An unexpected error occurred.");

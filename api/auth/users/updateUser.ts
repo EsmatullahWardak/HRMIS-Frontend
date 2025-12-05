@@ -2,7 +2,10 @@ import axios from "axios";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
-export const updateUser = async (userId: number, userData: { name: string; email: string }) => {
+export const updateUser = async (
+  userId: number,
+  userData: { name: string; email: string; is_active?: boolean }
+) => {
   try {
     const response = await axios.put(`${API_URL}/users/${userId}`, userData);
     return response.data;
