@@ -32,6 +32,7 @@ import {
   RefreshCw,
   DollarSign,
   ChevronDown,
+  LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -46,19 +47,19 @@ const menuItems = [
   },
   {
     title: "Dashboard",
-    url: "/",
-    icon: Home,
+    url: "/dashboard",
+    icon: LayoutDashboard,
   },
-  {
-    title: "active",
-    url: "/active",
-    icon: UserCheck,
-  },
-  {
-    title: "Users",
-    url: "/users",
-    icon: Users,
-  },
+  // {
+  //   title: "active",
+  //   url: "/active",
+  //   icon: UserCheck,
+  // },
+  // {
+  //   title: "Users",
+  //   url: "/users",
+  //   icon: Users,
+  // },
   {
     title: "Leave",
     url: "/Leave",
