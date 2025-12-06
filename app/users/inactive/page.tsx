@@ -9,12 +9,14 @@ import { deleteUser } from "@/api/auth/users/deleteUser";
 import UsersTable from "@/components/users/UsersTable";
 import { updateUser } from "@/api/auth/users/updateUser";
 import EditUserModal from "@/components/users/EditUserModal";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface User {
   id: number;
   name: string | null;
   email: string;
   createdAt: string;
+  is_active: boolean;
 }
 
 export default function InactiveUsersPage() {
@@ -121,6 +123,27 @@ export default function InactiveUsersPage() {
           <Button onClick={handleLogout} variant='destructive'>
             Logout
           </Button>
+        </div>
+
+        {/* Inactive Users Cards */}
+        <div className='mb-8'>
+          <h2 className='text-2xl font-bold mb-4 text-red-600'>
+            Inactive Users
+          </h2>
+          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+            {users.map((user) => (
+              <Card key={user.id}>
+                <CardHeader>
+                  <CardTitle className='text-lg'>
+                    {user.name || "No Name"}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className='text-sm text-gray-600'>{user.email}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
         </div>
 
         <UsersTable
