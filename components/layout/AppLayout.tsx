@@ -61,6 +61,11 @@ const menuItems = [
   //   icon: Users,
   // },
   {
+    title: "Products",
+    url: "/products",
+    icon: ShoppingCart,
+  },
+  {
     title: "Leave",
     url: "/Leave",
     icon: Calendar,
@@ -85,11 +90,7 @@ const menuItems = [
     url: "/loan-advance",
     icon: DollarSign,
   },
-  {
-    title: "Products",
-    url: "/products",
-    icon: ShoppingCart,
-  },
+
   {
     title: "Advance Salary",
     url: "/wallet",
