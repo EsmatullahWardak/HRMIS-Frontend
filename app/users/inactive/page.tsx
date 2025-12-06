@@ -128,7 +128,7 @@ export default function InactiveUsersPage() {
         {/* Inactive Users Cards */}
         <div className='mb-8'>
           <h2 className='text-2xl font-bold mb-4 text-red-600'>
-            Inactive Users
+            Inactive Users ({users.length})
           </h2>
           <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
             {users.map((user) => (
