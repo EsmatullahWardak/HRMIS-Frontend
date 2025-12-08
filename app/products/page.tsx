@@ -7,6 +7,8 @@ import { isAuthenticated, getUserFromToken } from "@/lib/auth";
 import AddProductModal from "@/components/products/AddProductModal";
 import { productsApi } from "@/lib/api/products";
 import { Pencil, Trash2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import EditProductModal from "@/components/products/EditProductModal";
 import {
   AlertDialog,
@@ -138,6 +140,54 @@ export default function ProductsPage() {
           </div>
 
           <Button onClick={() => setIsAddModalOpen(true)}>+ Add Product</Button>
+        </div>
+
+        {/* Active Products Cards */}
+        <div className='mb-8'>
+          <h2 className='text-2xl font-bold mb-4 text-green-600'>
+            Active Products ({products.filter((p) => p.isActive).length})
+          </h2>
+          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+            {products
+              .filter((p) => p.isActive)
+              .map((product) => (
+                <Card key={product.id}>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>{product.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className='text-sm text-gray-600'>{product.category}</p>
+                    <p className='text-sm font-bold text-green-600'>
+                      ${product.price.toFixed(2)}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+          </div>
+        </div>
+
+        {/* Inactive Products Cards */}
+        <div className='mb-8'>
+          <h2 className='text-2xl font-bold mb-4 text-red-600'>
+            Inactive Products ({products.filter((p) => !p.isActive).length})
+          </h2>
+          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
+            {products
+              .filter((p) => !p.isActive)
+              .map((product) => (
+                <Card key={product.id}>
+                  <CardHeader>
+                    <CardTitle className='text-lg'>{product.name}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className='text-sm text-gray-600'>{product.category}</p>
+                    <p className='text-sm font-bold text-red-600'>
+                      ${product.price.toFixed(2)}
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+          </div>
         </div>
 
         {/* Products Display */}
