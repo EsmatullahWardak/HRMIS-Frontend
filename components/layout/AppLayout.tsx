@@ -78,7 +78,8 @@ const menuItems = [
   },
   {
     title: "Resources",
-    url: "/resources:",
+    // url: "/resources:",
+    url: "/resources",
     icon: FolderOpen,
   },
   {
