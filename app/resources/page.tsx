@@ -46,12 +46,18 @@ export default function ResourcesPage() {
       </div>
 
       {/* Content */}
-      <div className='text-center text-gray-500 py-8'>
-        {activeTab === "documents" ? (
-          <p>No documents found.</p>
-        ) : (
-          <p>No videos found.</p>
-        )}
+      <div className='flex flex-col items-center justify-center py-16'>
+        <div className='bg-gray-50 rounded-lg shadow-md p-8 text-center max-w-md'>
+          <p className='text-6xl mb-4'>🚧</p>
+          <h2 className='text-2xl font-semibold text-gray-700 mb-2'>
+            Coming Soon
+          </h2>
+          <p className='text-gray-500'>
+            {activeTab === "documents"
+              ? "Documents section is under development."
+              : "Videos section is under development."}
+          </p>
+        </div>
       </div>
     </div>
   );
