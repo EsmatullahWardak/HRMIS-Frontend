@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -114,7 +115,15 @@ interface DropdownMenuItemProps {
 }
 
 function DropdownMenuItem({ label, items }: DropdownMenuItemProps) {
-  const [isOpen, setIsOpen] = useState(false);
+  const pathname = usePathname();
+  const isChildActive = items.some((item) => pathname === item.url);
+  const [isOpen, setIsOpen] = useState(isChildActive);
+
+  useEffect(() => {
+    if (isChildActive) {
+      setIsOpen(true);
+    }
+  }, [pathname, isChildActive]);
 
   return (
     <SidebarMenuItem>
