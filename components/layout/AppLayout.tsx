@@ -67,6 +67,12 @@ const menuItems = [
     icon: ShoppingCart,
   },
   {
+    title: "Resources",
+    // url: "/resources:",
+    url: "/resources",
+    icon: FolderOpen,
+  },
+  {
     title: "Leave",
     url: "/Leave",
     icon: Calendar,
@@ -76,12 +82,7 @@ const menuItems = [
     url: "/overtime",
     icon: Clock,
   },
-  {
-    title: "Resources",
-    // url: "/resources:",
-    url: "/resources",
-    icon: FolderOpen,
-  },
+
   {
     title: "Change Shift",
     url: "/change-shift",
