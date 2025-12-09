@@ -210,9 +210,9 @@ export function AppSidebar({
       <SidebarFooter>
         <div className='p-4 border-t'>
           <div className='flex items-center gap-2 mb-2'>
-            <div className='h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center'>
+            {/* <div className='h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center'>
               {currentUser?.name?.[0] || "U"}
-            </div>
+            </div> */}
             <div className='flex-1 text-left text-sm'>
               <div className='font-medium'>{currentUser?.name || "User"}</div>
               <div className='text-xs text-muted-foreground'>
