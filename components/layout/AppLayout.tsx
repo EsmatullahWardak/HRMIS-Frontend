@@ -73,6 +73,11 @@ const menuItems = [
     icon: FolderOpen,
   },
   {
+    title: "Loan & Advance",
+    url: "/loan-advance",
+    icon: DollarSign,
+  },
+  {
     title: "Leave",
     url: "/Leave",
     icon: Calendar,
@@ -87,11 +92,6 @@ const menuItems = [
     title: "Change Shift",
     url: "/change-shift",
     icon: RefreshCw,
-  },
-  {
-    title: "Loan & Advance",
-    url: "/loan-advance",
-    icon: DollarSign,
   },
 
   {
