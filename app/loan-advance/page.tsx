@@ -158,7 +158,7 @@ export default function LoanAdvancePage() {
       {/* Modal */}
       {isModalOpen && (
         <div className='fixed inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-50'>
-          <div className='bg-white rounded-lg w-full max-w-2xl p-6 text-white shadow-2xl'>
+          <div className='bg-white rounded-lg w-full max-w-2xl p-6 shadow-2xl'>
             {/* Modal Header */}
             <div className='flex justify-between items-center mb-6'>
               <h2 className='text-xl text-gray-800 font-semibold'>
@@ -180,33 +180,33 @@ export default function LoanAdvancePage() {
             </div>
 
             {/* Loan Type Buttons */}
-            <div className='flex gap-2 mb-6'>
+            <div className='flex gap-6 mb-6'>
               <button
                 onClick={() => setSelectedLoanType("100")}
-                className={`px-4 py-2 rounded-full ${
+                className={`px-6 py-2 rounded-full flex items-center gap-2 ${
                   selectedLoanType === "100"
-                    ? "bg-gray-200 text-gray-800 border-2 border-gray-400"
-                    : "bg-white text-gray-600 border border-gray-300"
+                    ? "border-2 border-gray-400 text-gray-800"
+                    : "text-gray-500"
                 }`}
               >
-                $ 100$ Loan
+                <DollarSign className='h-4 w-4' /> 100$ Loan
               </button>
               <button
                 onClick={() => setSelectedLoanType("1month")}
-                className={`px-4 py-2 rounded-full flex items-center gap-2 ${
+                className={`px-6 py-2 rounded-full flex items-center gap-2 ${
                   selectedLoanType === "1month"
-                    ? "bg-gray-200 text-gray-800 border-2 border-gray-400"
-                    : "bg-white text-gray-600 border border-gray-300"
+                    ? "border-2 border-gray-400 text-gray-800"
+                    : "text-gray-500"
                 }`}
               >
                 <Calendar className='h-4 w-4' /> 1 Month
               </button>
               <button
                 onClick={() => setSelectedLoanType("3month")}
-                className={`px-4 py-2 rounded-full flex items-center gap-2 ${
+                className={`px-6 py-2 rounded-full flex items-center gap-2 ${
                   selectedLoanType === "3month"
-                    ? "bg-gray-200 text-gray-800 border-2 border-gray-400"
-                    : "bg-white text-gray-600 border border-gray-300"
+                    ? "border-2 border-gray-400 text-gray-800"
+                    : "text-gray-500"
                 }`}
               >
                 <Calendar className='h-4 w-4' /> 3 Month
@@ -259,14 +259,21 @@ export default function LoanAdvancePage() {
                 <label className='text-sm text-gray-500'>
                   Monthly Deduction *
                 </label>
-                <div className='bg-gray-100 border border-gray-200 rounded-lg p-3 mt-1 flex items-center gap-2'>
+                <div className='bg-white border border-gray-300 rounded-lg p-3 mt-1 flex items-center gap-2'>
                   <span className='text-gray-500'>$</span>
                   <input
-                    type='number'
+                    type='text'
+                    inputMode='decimal'
                     placeholder='0.00'
                     value={monthlyDeduction}
-                    onChange={(e) => setMonthlyDeduction(e.target.value)}
-                    className='bg-transparent text-gray-800 outline-none w-full'
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                        setMonthlyDeduction(value);
+                      }
+                    }}
+                    className='flex-1 bg-transparent text-gray-800 outline-none'
+                    autoComplete='off'
                   />
                 </div>
 
@@ -358,14 +365,21 @@ export default function LoanAdvancePage() {
                 <label className='text-sm text-gray-500 mt-4 block'>
                   Monthly Deduction *
                 </label>
-                <div className='bg-gray-100 border border-gray-200 rounded-lg p-3 mt-1 flex items-center gap-2'>
+                <div className='bg-white border border-gray-300 rounded-lg p-3 mt-1 flex items-center gap-2'>
                   <span className='text-gray-500'>$</span>
                   <input
-                    type='number'
+                    type='text'
+                    inputMode='decimal'
                     placeholder='0.00'
                     value={monthlyDeduction}
-                    onChange={(e) => setMonthlyDeduction(e.target.value)}
-                    className='bg-transparent text-gray-800 outline-none w-full'
+                    onChange={(e) => {
+                      const value = e.target.value;
+                      if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
+                        setMonthlyDeduction(value);
+                      }
+                    }}
+                    className='flex-1 bg-transparent text-gray-800 outline-none'
+                    autoComplete='off'
                   />
                 </div>
 
