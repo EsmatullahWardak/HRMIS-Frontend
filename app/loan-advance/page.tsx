@@ -9,6 +9,8 @@ export default function LoanAdvancePage() {
   const [selectedLoanType, setSelectedLoanType] = useState("100");
   const [loans, setLoans] = useState<any[]>([]);
   const [notes, setNotes] = useState("");
+  const [monthlyDeduction, setMonthlyDeduction] = useState("");
+  const [selectedMonth, setSelectedMonth] = useState("");
   const handleSubmit = () => {
     const newLoan = {
       id: loans.length + 1,
@@ -194,31 +196,94 @@ export default function LoanAdvancePage() {
             {/* Selected Loan Info */}
             <div className='bg-gray-100 border border-gray-200 rounded-lg p-4 mb-4'>
               <div className='flex items-center gap-2'>
-                <DollarSign className='h-5 w-5 text-gray-700' />
+                <Calendar className='h-5 w-5 text-gray-700' />
                 <div>
-                  <p className='font-semibold text-gray-800'>100$ Loan</p>
-                  <p className='text-sm text-gray-500'>Full salary advance</p>
+                  <p className='font-semibold text-gray-800'>
+                    {selectedLoanType === "100"
+                      ? "100$ Loan"
+                      : selectedLoanType === "1month"
+                      ? "1 Month"
+                      : "3 Month"}
+                  </p>
+                  <p className='text-sm text-gray-500'>
+                    {selectedLoanType === "100"
+                      ? "Full salary advance"
+                      : "Short-term loan"}
+                  </p>
                 </div>
               </div>
             </div>
 
-            {/* Input Fields */}
-            <div className='grid grid-cols-2 gap-4 mb-4'>
-              <div>
-                <label className='text-sm text-gray-500'>Loan Amount</label>
-                <div className='bg-gray-100 border border-gray-200 rounded-lg p-3 mt-1 text-gray-800'>
-                  $ 100.00
+            {/* Show different content based on loan type */}
+            {selectedLoanType === "100" ? (
+              /* 100$ Loan - Input Fields */
+              <div className='grid grid-cols-2 gap-4 mb-4'>
+                <div>
+                  <label className='text-sm text-gray-500'>Loan Amount</label>
+                  <div className='bg-gray-100 border border-gray-200 rounded-lg p-3 mt-1 text-gray-800'>
+                    $ 100.00
+                  </div>
+                </div>
+                <div>
+                  <label className='text-sm text-gray-500'>
+                    Monthly Deduction
+                  </label>
+                  <div className='bg-gray-100 border border-gray-200 rounded-lg p-3 mt-1 text-gray-800'>
+                    $ 100.00
+                  </div>
                 </div>
               </div>
-              <div>
+            ) : (
+              /* 1 Month or 3 Month - Different Fields */
+              <div className='mb-4'>
                 <label className='text-sm text-gray-500'>
-                  Monthly Deduction
+                  Monthly Deduction *
                 </label>
-                <div className='bg-gray-100 border border-gray-200 rounded-lg p-3 mt-1 text-gray-800'>
-                  $ 100.00
+                <div className='bg-gray-100 border border-gray-200 rounded-lg p-3 mt-1 flex items-center gap-2'>
+                  <span className='text-gray-500'>$</span>
+                  <input
+                    type='number'
+                    placeholder='0.00'
+                    value={monthlyDeduction}
+                    onChange={(e) => setMonthlyDeduction(e.target.value)}
+                    className='bg-transparent text-gray-800 outline-none w-full'
+                  />
+                </div>
+
+                <label className='text-sm text-gray-500 mt-4 block'>
+                  Repayment Month *{" "}
+                  <span className='text-gray-400'>(Select 1)</span>
+                </label>
+                <div className='flex flex-wrap gap-2 mt-2'>
+                  {[
+                    "Jan",
+                    "Feb",
+                    "Mar",
+                    "Apr",
+                    "May",
+                    "Jun",
+                    "Jul",
+                    "Aug",
+                    "Sep",
+                    "Oct",
+                    "Nov",
+                    "Dec",
+                  ].map((month) => (
+                    <button
+                      key={month}
+                      onClick={() => setSelectedMonth(month)}
+                      className={`px-3 py-1 rounded-full text-sm ${
+                        selectedMonth === month
+                          ? "bg-gray-800 text-white"
+                          : "bg-white text-gray-600 border border-gray-300"
+                      }`}
+                    >
+                      {month}
+                    </button>
+                  ))}
                 </div>
               </div>
-            </div>
+            )}
 
             {/* Additional Notes */}
             <div className='mb-6'>
@@ -237,7 +302,11 @@ export default function LoanAdvancePage() {
               <p className='text-sm text-gray-600'>
                 Applying for:{" "}
                 <span className='bg-gray-200 text-gray-800 px-2 py-1 rounded'>
-                  100$ Loan
+                  {selectedLoanType === "100"
+                    ? "100$ Loan"
+                    : selectedLoanType === "1month"
+                    ? "1 Month"
+                    : "3 Month"}
                 </span>
               </p>
               <Button onClick={handleSubmit}>Submit</Button>
