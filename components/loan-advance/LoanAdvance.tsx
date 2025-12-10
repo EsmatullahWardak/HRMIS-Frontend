@@ -7,6 +7,7 @@ import { getActiveUsers } from "@/api/auth/users/getActiveUsers";
 import { EmptyState } from "./EmptyState";
 import { LoanTypeButtons } from "./LoanTypeButton";
 import { LoansTable } from "./LoansTable";
+import { LoanForm100 } from "./LoanForm100";
 
 export function LoanAdvanceContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -141,23 +142,7 @@ export function LoanAdvanceContent() {
 
             {/* Show different content based on loan type */}
             {selectedLoanType === "100" ? (
-              /* 100$ Loan - Input Fields */
-              <div className='grid grid-cols-2 gap-4 mb-4'>
-                <div>
-                  <label className='text-sm text-gray-500'>Loan Amount</label>
-                  <div className='bg-gray-100 border border-gray-200 rounded-lg p-3 mt-1 text-gray-800'>
-                    $ 100.00
-                  </div>
-                </div>
-                <div>
-                  <label className='text-sm text-gray-500'>
-                    Monthly Deduction
-                  </label>
-                  <div className='bg-gray-100 border border-gray-200 rounded-lg p-3 mt-1 text-gray-800'>
-                    $ 100.00
-                  </div>
-                </div>
-              </div>
+              <LoanForm100 />
             ) : selectedLoanType === "1month" ? (
               /* 1 Month - Fields */
               <div className='mb-4'>
