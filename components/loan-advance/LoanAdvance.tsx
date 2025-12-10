@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { DollarSign, Calendar, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getActiveUsers } from "@/api/auth/users/getActiveUsers";
+import { EmptyState } from "./EmptyState";
+import { LoanTypeButtons } from "./LoanTypeButton";
 
 export function LoanAdvanceContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -81,22 +83,7 @@ export function LoanAdvanceContent() {
 
       {/* Loans Table or Empty State */}
       {loans.length === 0 ? (
-        <div className='flex flex-col items-center justify-center py-20'>
-          <div className='h-20 w-20 rounded-full bg-gray-100 flex items-center justify-center mb-4'>
-            <DollarSign className='h-10 w-10 text-gray-400' />
-          </div>
-          <h2 className='text-xl font-semibold text-gray-700 mb-2'>
-            No loans found
-          </h2>
-          <p className='text-gray-500 text-center mb-6'>
-            You haven't applied for any loans yet. Request your
-            <br />
-            first loan to get started.
-          </p>
-          <Button variant='outline' onClick={() => setIsModalOpen(true)}>
-            + Request Your First Loan
-          </Button>
-        </div>
+        <EmptyState onRequestLoan={() => setIsModalOpen(true)} />
       ) : (
         <div className='mt-6'>
           {/* Table Header */}
@@ -180,38 +167,10 @@ export function LoanAdvanceContent() {
             </div>
 
             {/* Loan Type Buttons */}
-            <div className='flex gap-6 mb-6'>
-              <button
-                onClick={() => setSelectedLoanType("100")}
-                className={`px-6 py-2 rounded-full flex items-center gap-2 ${
-                  selectedLoanType === "100"
-                    ? "border-2 border-gray-400 text-gray-800"
-                    : "text-gray-500"
-                }`}
-              >
-                <DollarSign className='h-4 w-4' /> 100$ Loan
-              </button>
-              <button
-                onClick={() => setSelectedLoanType("1month")}
-                className={`px-6 py-2 rounded-full flex items-center gap-2 ${
-                  selectedLoanType === "1month"
-                    ? "border-2 border-gray-400 text-gray-800"
-                    : "text-gray-500"
-                }`}
-              >
-                <Calendar className='h-4 w-4' /> 1 Month
-              </button>
-              <button
-                onClick={() => setSelectedLoanType("3month")}
-                className={`px-6 py-2 rounded-full flex items-center gap-2 ${
-                  selectedLoanType === "3month"
-                    ? "border-2 border-gray-400 text-gray-800"
-                    : "text-gray-500"
-                }`}
-              >
-                <Calendar className='h-4 w-4' /> 3 Month
-              </button>
-            </div>
+            <LoanTypeButtons
+              selectedLoanType={selectedLoanType}
+              onSelectLoanType={setSelectedLoanType}
+            />
 
             {/* Selected Loan Info */}
             <div className='bg-gray-100 border border-gray-200 rounded-lg p-4 mb-4'>
