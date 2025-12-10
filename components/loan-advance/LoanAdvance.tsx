@@ -9,6 +9,7 @@ import { LoanTypeButtons } from "./LoanTypeButton";
 import { LoansTable } from "./LoansTable";
 import { LoanForm100 } from "./LoanForm100";
 import { LoanForm1Month } from "./LoanForm1Month";
+import { LoanForm3Month } from "./LoanForm3Month";
 
 export function LoanAdvanceContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -152,120 +153,22 @@ export function LoanAdvanceContent() {
                 onSelectedMonthChange={setSelectedMonth}
               />
             ) : (
-              /* 3 Month - Fields with Guarantor */
-              <div className='mb-4'>
-                {/* Guarantor Dropdown */}
-                <label className='text-sm text-gray-500'>Guarantor *</label>
-                <div className='relative mt-1'>
-                  <button
-                    onClick={() =>
-                      setShowGuarantorDropdown(!showGuarantorDropdown)
-                    }
-                    className='w-full bg-gray-100 border border-gray-200 rounded-lg p-3 text-left text-gray-800 flex justify-between items-center'
-                  >
-                    {guarantor || "Select guarantor (required)"}
-                    <span className='text-gray-400'>▼</span>
-                  </button>
-                  {showGuarantorDropdown && (
-                    <div className='absolute z-10 w-full bg-white border border-gray-200 rounded-lg mt-1 shadow-lg max-h-60 overflow-y-auto'>
-                      <div className='p-2 border-b'>
-                        <input
-                          type='text'
-                          placeholder='Search employees...'
-                          value={guarantorSearch}
-                          onChange={(e) => setGuarantorSearch(e.target.value)}
-                          className='w-full p-2 border border-gray-200 rounded-lg text-gray-800 outline-none'
-                        />
-                      </div>
-                      {employees
-                        .filter((emp) =>
-                          (emp.name || "")
-                            .toLowerCase()
-                            .includes(guarantorSearch.toLowerCase())
-                        )
-                        .map((emp) => (
-                          <button
-                            key={emp.id}
-                            onClick={() => {
-                              setGuarantor(
-                                `${emp.name || "No Name"} (${emp.id})`
-                              );
-                              setShowGuarantorDropdown(false);
-                              setGuarantorSearch("");
-                            }}
-                            className='w-full text-left px-4 py-2 hover:bg-gray-100 text-gray-800'
-                          >
-                            {emp.name || "No Name"} ({emp.id})
-                          </button>
-                        ))}
-                    </div>
-                  )}
-                </div>
-
-                {/* Monthly Deduction */}
-                <label className='text-sm text-gray-500 mt-4 block'>
-                  Monthly Deduction *
-                </label>
-                <div className='bg-white border border-gray-300 rounded-lg p-3 mt-1 flex items-center gap-2'>
-                  <span className='text-gray-500'>$</span>
-                  <input
-                    type='text'
-                    inputMode='decimal'
-                    placeholder='0.00'
-                    value={monthlyDeduction}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
-                        setMonthlyDeduction(value);
-                      }
-                    }}
-                    className='flex-1 bg-transparent text-gray-800 outline-none'
-                    autoComplete='off'
-                  />
-                </div>
-
-                {/* Repayment Months - Select 3 */}
-                <label className='text-sm text-gray-500 mt-4 block'>
-                  Repayment Months *{" "}
-                  <span className='text-gray-400'>(Select 3)</span>
-                </label>
-                <div className='flex flex-wrap gap-2 mt-2'>
-                  {[
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec",
-                  ].map((month) => (
-                    <button
-                      key={month}
-                      onClick={() => {
-                        if (selectedMonths.includes(month)) {
-                          setSelectedMonths(
-                            selectedMonths.filter((m) => m !== month)
-                          );
-                        } else if (selectedMonths.length < 3) {
-                          setSelectedMonths([...selectedMonths, month]);
-                        }
-                      }}
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        selectedMonths.includes(month)
-                          ? "bg-gray-800 text-white"
-                          : "bg-white text-gray-600 border border-gray-300"
-                      }`}
-                    >
-                      {month}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <LoanForm3Month
+                guarantor={guarantor}
+                onGuarantorChange={setGuarantor}
+                showGuarantorDropdown={showGuarantorDropdown}
+                onToggleDropdown={() =>
+                  setShowGuarantorDropdown(!showGuarantorDropdown)
+                }
+                onCloseDropdown={() => setShowGuarantorDropdown(false)}
+                guarantorSearch={guarantorSearch}
+                onGuarantorSearchChange={setGuarantorSearch}
+                employees={employees}
+                monthlyDeduction={monthlyDeduction}
+                onMonthlyDeductionChange={setMonthlyDeduction}
+                selectedMonths={selectedMonths}
+                onSelectedMonthsChange={setSelectedMonths}
+              />
             )}
 
             {/* Additional Notes */}
