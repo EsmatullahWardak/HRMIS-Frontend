@@ -2,6 +2,6 @@
 
 import { LoanAdvanceContent } from "@/components/loan-advance/LoanAdvance";
 
-export default function LoanAdvanceContentPage() {
+export default function LoanAdvancePage() {
   return <LoanAdvanceContent />;
 }
