@@ -8,6 +8,7 @@ import { EmptyState } from "./EmptyState";
 import { LoanTypeButtons } from "./LoanTypeButton";
 import { LoansTable } from "./LoansTable";
 import { LoanForm100 } from "./LoanForm100";
+import { LoanForm1Month } from "./LoanForm1Month";
 
 export function LoanAdvanceContent() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -144,62 +145,12 @@ export function LoanAdvanceContent() {
             {selectedLoanType === "100" ? (
               <LoanForm100 />
             ) : selectedLoanType === "1month" ? (
-              /* 1 Month - Fields */
-              <div className='mb-4'>
-                <label className='text-sm text-gray-500'>
-                  Monthly Deduction *
-                </label>
-                <div className='bg-white border border-gray-300 rounded-lg p-3 mt-1 flex items-center gap-2'>
-                  <span className='text-gray-500'>$</span>
-                  <input
-                    type='text'
-                    inputMode='decimal'
-                    placeholder='0.00'
-                    value={monthlyDeduction}
-                    onChange={(e) => {
-                      const value = e.target.value;
-                      if (value === "" || /^[0-9]*\.?[0-9]*$/.test(value)) {
-                        setMonthlyDeduction(value);
-                      }
-                    }}
-                    className='flex-1 bg-transparent text-gray-800 outline-none'
-                    autoComplete='off'
-                  />
-                </div>
-
-                <label className='text-sm text-gray-500 mt-4 block'>
-                  Repayment Month *{" "}
-                  <span className='text-gray-400'>(Select 1)</span>
-                </label>
-                <div className='flex flex-wrap gap-2 mt-2'>
-                  {[
-                    "Jan",
-                    "Feb",
-                    "Mar",
-                    "Apr",
-                    "May",
-                    "Jun",
-                    "Jul",
-                    "Aug",
-                    "Sep",
-                    "Oct",
-                    "Nov",
-                    "Dec",
-                  ].map((month) => (
-                    <button
-                      key={month}
-                      onClick={() => setSelectedMonth(month)}
-                      className={`px-3 py-1 rounded-full text-sm ${
-                        selectedMonth === month
-                          ? "bg-gray-800 text-white"
-                          : "bg-white text-gray-600 border border-gray-300"
-                      }`}
-                    >
-                      {month}
-                    </button>
-                  ))}
-                </div>
-              </div>
+              <LoanForm1Month
+                monthlyDeduction={monthlyDeduction}
+                onMonthlyDeductionChange={setMonthlyDeduction}
+                selectedMonth={selectedMonth}
+                onSelectedMonthChange={setSelectedMonth}
+              />
             ) : (
               /* 3 Month - Fields with Guarantor */
               <div className='mb-4'>
