@@ -4,6 +4,8 @@ import { useState, useEffect } from "react";
 import { DollarSign, Calendar, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getActiveUsers } from "@/api/auth/users/getActiveUsers";
+import { createLoan } from "@/api/loans/CreateLoan";
+import { getLoans } from "@/api/loans/getloans";
 import { EmptyState } from "./EmptyState";
 import { LoanTypeButtons } from "./LoanTypeButton";
 import { LoansTable } from "./LoansTable";
@@ -26,42 +28,60 @@ export function LoanAdvanceContent() {
   const [employees, setEmployees] = useState<
     { id: number; name: string | null }[]
   >([]);
+
+  // Fetch employees and loans on page load
   useEffect(() => {
-    const fetchEmployees = async () => {
+    const fetchData = async () => {
       try {
-        const data = await getActiveUsers();
-        setEmployees(data);
+        const [employeesData, loansData] = await Promise.all([
+          getActiveUsers(),
+          getLoans(),
+        ]);
+        setEmployees(employeesData);
+        setLoans(loansData);
       } catch (error) {
-        console.error("Failed to fetch employees:", error);
+        console.error("Failed to fetch data:", error);
       }
     };
-    fetchEmployees();
+    fetchData();
   }, []);
-  const handleSubmit = () => {
-    const newLoan = {
-      id: loans.length + 1,
-      type:
-        selectedLoanType === "100"
-          ? "100$ Loan"
-          : selectedLoanType === "1month"
-          ? "1 Month"
-          : "3 Month",
-      amount: 100,
-      remaining: 100,
-      monthly: 100,
+
+  const handleSubmit = async () => {
+    const loanType =
+      selectedLoanType === "100"
+        ? "100$ Loan"
+        : selectedLoanType === "1month"
+        ? "1 Month"
+        : "3 Month";
+
+    const amount =
+      selectedLoanType === "100" ? 100 : parseFloat(monthlyDeduction) || 0;
+
+    const newLoanData = {
+      type: loanType,
+      amount: amount,
+      remaining: amount,
+      monthlyDeduction: amount,
       status: "Pending",
-      issuedDate: new Date().toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      }),
-      guarantor: "Not required",
-      notes: notes,
+      guarantor: selectedLoanType === "3month" ? guarantor : undefined,
+      notes: notes || undefined,
       progress: 0,
     };
-    setLoans([...loans, newLoan]);
-    setNotes("");
-    setIsModalOpen(false);
+
+    try {
+      const savedLoan = await createLoan(newLoanData);
+      setLoans([savedLoan, ...loans]);
+      // Reset form
+      setNotes("");
+      setMonthlyDeduction("");
+      setSelectedMonth("");
+      setSelectedMonths([]);
+      setGuarantor("");
+      setIsModalOpen(false);
+    } catch (error) {
+      console.error("Failed to create loan:", error);
+      alert("Failed to create loan. Please try again.");
+    }
   };
   return (
     <div className='min-h-screen bg-white p-6'>

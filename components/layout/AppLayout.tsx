@@ -79,7 +79,7 @@ const menuItems = [
   },
   {
     title: "Leave",
-    url: "/Leave",
+    url: "/leave",
     icon: Calendar,
   },
   {
