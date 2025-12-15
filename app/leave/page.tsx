@@ -132,13 +132,12 @@ export default function LeavePage() {
       setDownloading(true);
       setError(null);
 
-      const userId = form.userId?.trim();
-      if (!userId) throw new Error("Please enter User ID");
       if (!reportMonth) throw new Error("Please select report month");
 
-      const url = `${API}/leave/report/monthly/export?month=${encodeURIComponent(
+      // Download ALL leaves for the selected month
+      const url = `${API}/leave/report/monthly/export-all?month=${encodeURIComponent(
         reportMonth
-      )}&userId=${encodeURIComponent(userId)}`;
+      )}`;
 
       const res = await fetch(url);
       if (!res.ok) throw new Error(await res.text());
@@ -147,7 +146,7 @@ export default function LeavePage() {
 
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `leave-report-${reportMonth}-user-${userId}.csv`;
+      a.download = `leave-report-${reportMonth}-all-users.csv`;
       document.body.appendChild(a);
       a.click();
       a.remove();
