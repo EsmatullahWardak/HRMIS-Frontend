@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -36,7 +35,13 @@ export default function LeavePage() {
   const [leaves, setLeaves] = useState<Leave[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [downloading, setDownloading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const [reportMonth, setReportMonth] = useState(() => {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+  });
 
   const [form, setForm] = useState({
     type: "",
@@ -52,12 +57,12 @@ export default function LeavePage() {
       setError(null);
 
       const res = await fetch(`${API}/leave`, { cache: "no-store" });
-      if (!res.ok) throw new Error("Failed to fetch leaves");
+      if (!res.ok) throw new Error(await res.text());
 
       const data = await res.json();
       setLeaves(data);
     } catch (e: any) {
-      setError(e.message ?? "Failed to fetch leaves");
+      setError(e?.message ?? "Failed to fetch leaves");
     } finally {
       setLoading(false);
     }
@@ -69,7 +74,6 @@ export default function LeavePage() {
 
   const createLeave = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       setSubmitting(true);
       setError(null);
@@ -89,11 +93,7 @@ export default function LeavePage() {
         body: JSON.stringify(payload),
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        console.error(text);
-        throw new Error("Failed to create leave");
-      }
+      if (!res.ok) throw new Error(await res.text());
 
       setForm({
         type: "",
@@ -104,7 +104,7 @@ export default function LeavePage() {
       });
       await fetchLeaves();
     } catch (e: any) {
-      setError(e.message ?? "Failed to create leave");
+      setError(e?.message ?? "Failed to create leave");
     } finally {
       setSubmitting(false);
     }
@@ -120,15 +120,42 @@ export default function LeavePage() {
         body: JSON.stringify({ status }),
       });
 
-      if (!res.ok) {
-        const text = await res.text();
-        console.error(text);
-        throw new Error("Failed to update status");
-      }
-
+      if (!res.ok) throw new Error(await res.text());
       await fetchLeaves();
     } catch (e: any) {
-      setError(e.message ?? "Failed to update status");
+      setError(e?.message ?? "Failed to update status");
+    }
+  };
+
+  const downloadCsv = async () => {
+    try {
+      setDownloading(true);
+      setError(null);
+
+      const userId = form.userId?.trim();
+      if (!userId) throw new Error("Please enter User ID");
+      if (!reportMonth) throw new Error("Please select report month");
+
+      const url = `${API}/leave/report/monthly/export?month=${encodeURIComponent(
+        reportMonth
+      )}&userId=${encodeURIComponent(userId)}`;
+
+      const res = await fetch(url);
+      if (!res.ok) throw new Error(await res.text());
+
+      const blob = await res.blob();
+
+      const a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = `leave-report-${reportMonth}-user-${userId}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(a.href);
+    } catch (e: any) {
+      setError(e?.message ?? "Download failed");
+    } finally {
+      setDownloading(false);
     }
   };
 
@@ -153,7 +180,6 @@ export default function LeavePage() {
         </div>
       )}
 
-      {/* Create Leave */}
       <Card>
         <CardHeader>
           <CardTitle>Create Leave</CardTitle>
@@ -231,14 +257,35 @@ export default function LeavePage() {
         </CardContent>
       </Card>
 
-      {/* List Leaves */}
       <Card>
-        <CardHeader className='flex flex-row items-center justify-between'>
+        <CardHeader className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
           <CardTitle>All Leaves</CardTitle>
-          {loading && (
-            <span className='text-xs text-muted-foreground'>Loading...</span>
-          )}
+
+          <div className='flex flex-col gap-2 md:flex-row md:items-center'>
+            <div className='flex items-center gap-2'>
+              <Label className='text-xs'>Report Month</Label>
+              <Input
+                type='month'
+                value={reportMonth}
+                onChange={(e) => setReportMonth(e.target.value)}
+                className='h-9 w-[160px]'
+              />
+            </div>
+
+            <Button
+              variant='outline'
+              onClick={downloadCsv}
+              disabled={downloading}
+            >
+              {downloading ? "Downloading..." : "Download Excel (CSV)"}
+            </Button>
+
+            {loading && (
+              <span className='text-xs text-muted-foreground'>Loading...</span>
+            )}
+          </div>
         </CardHeader>
+
         <CardContent>
           {leaves.length === 0 ? (
             <p className='text-sm text-muted-foreground'>
