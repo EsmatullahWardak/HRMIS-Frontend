@@ -166,7 +166,7 @@ export function AppSidebar({
   return (
     <Sidebar>
       <SidebarHeader>
-        <div className='flex items-center gap-2 px-4 py-2'>
+        <div className='flex items-center gap-2 px-4 py-2 border-b border-slate-150'>
           {/* <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground'>
             <Home className='h-4 w-4' />
           </div> */}
@@ -207,31 +207,18 @@ export function AppSidebar({
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter>
-        <div className='p-4 border-t'>
-          <div className='flex items-center gap-2 mb-2'>
-            {/* <div className='h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center'>
-              {currentUser?.name?.[0] || "U"}
-            </div> */}
-            <div className='flex-1 text-left text-sm'>
-              <div className='font-medium'>{currentUser?.name || "User"}</div>
-              <div className='text-xs text-muted-foreground'>
-                {currentUser?.email}
-              </div>
-            </div>
-          </div>
-          {onLogout && (
-            <Button
-              variant='outline'
-              size='sm'
-              onClick={onLogout}
-              className='w-full'
-            >
-              <LogOut className='h-4 w-4 mr-2' />
-              Logout
-            </Button>
-          )}
-        </div>
+      <SidebarFooter className='mt-auto border-t border-slate-50 p-2'>
+        {onLogout && (
+          <Button
+            variant='ghost'
+            size='sm'
+            onClick={onLogout}
+            className='w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50'
+          >
+            <LogOut className='h-4 w-4 mr-2' />
+            Logout
+          </Button>
+        )}
       </SidebarFooter>
     </Sidebar>
   );
