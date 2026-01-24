@@ -164,12 +164,9 @@ export function AppSidebar({
   onLogout?: () => void;
 }) {
   return (
-    <Sidebar>
+    <Sidebar variant='floating'>
       <SidebarHeader>
         <div className='flex items-center gap-2 px-4 py-2 border-b border-slate-150'>
-          {/* <div className='flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground'>
-            <Home className='h-4 w-4' />
-          </div> */}
           <div className='flex items-center'>
             <img src='/logo.png' alt='HRMIS Logo' className='h-10' />
           </div>
@@ -213,7 +210,7 @@ export function AppSidebar({
             variant='ghost'
             size='sm'
             onClick={onLogout}
-            className='w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50'
+            className='w-full justify-start text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg'
           >
             <LogOut className='h-4 w-4 mr-2' />
             Logout
@@ -231,7 +228,7 @@ export default function AppLayout({
 }: AppLayoutProps) {
   return (
     <SidebarProvider>
-      <div className='flex h-screen w-full'>
+      <div className='flex h-screen w-full p-4 gap-4 bg-slate-50'>
         <AppSidebar currentUser={currentUser} onLogout={onLogout} />
         <main className='flex-1 flex flex-col overflow-hidden'>
           <header className='border-b p-4'>

@@ -72,11 +72,11 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50`}
       >
         {showSidebar ? (
           <SidebarProvider>
-            <div className='flex h-screen w-full p-4 gap-4 bg-slate-50'>
+            <div className='flex h-screen w-full max-w-[1400px] mx-auto p-4 gap-4 overflow-hidden'>
               <AppSidebar currentUser={currentUser} onLogout={handleLogout} />
               <main className='flex-1 flex flex-col overflow-hidden bg-white border border-slate-200 rounded-2xl shadow-sm'>
                 <header className='border-b border-slate-100 p-4 flex items-center justify-between'>
