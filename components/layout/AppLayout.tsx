@@ -39,65 +39,62 @@ import { Button } from "@/components/ui/button";
 
 const menuItems = [
   {
+    title: "Home",
+    url: "/home",
+    icon: Home,
+  },
+  {
     type: "dropdown",
-    label: "Users",
+    label: "Dashboards",
+    icon: LayoutDashboard,
     items: [
-      { title: "Active", url: "/users/active", icon: UserCheck },
-      { title: "Inactive", url: "/users/inactive", icon: Users },
+      // { title: "Leaves", url: "/dashboard/leaves", icon: Calendar, count: 4891 },
+      // { title: "Overtime", url: "/dashboard/overtime", icon: Clock, count: 7720 },
+      // { title: "Attendance", url: "/dashboard/attendance", icon: Calendar, count: 48003 },
     ],
   },
   {
-    title: "Dashboard",
-    url: "/dashboard",
+    type: "dropdown",
+    label: "Services",
+    icon: Settings,
+    items: [
+      {
+        title: "Request a Leave",
+        url: "/services/request-leave",
+        icon: Calendar,
+      },
+      {
+        title: "Submit Overtime",
+        url: "/services/submit-overtime",
+        icon: Clock,
+      },
+      {
+        title: "View Resources",
+        url: "/services/view-resources",
+        icon: FolderOpen,
+      },
+      { title: "Change Shift", url: "/services/change-shift", icon: RefreshCw },
+      {
+        title: "Loans & Advances",
+        url: "/services/loans-advances",
+        icon: DollarSign,
+      },
+    ],
+  },
+  {
+    title: "My Dashboard",
+    url: "/my-dashboard",
     icon: LayoutDashboard,
   },
-  // {
-  //   title: "active",
-  //   url: "/active",
-  //   icon: UserCheck,
-  // },
-  // {
-  //   title: "Users",
-  //   url: "/users",
-  //   icon: Users,
-  // },
   {
-    title: "Products",
-    url: "/products",
-    icon: ShoppingCart,
-  },
-  {
-    title: "Resources",
-    // url: "/resources:",
-    url: "/resources",
+    title: "Feedbacks & Requests",
+    url: "/feedbacks",
     icon: FolderOpen,
   },
   {
-    title: "Loan & Advance",
-    url: "/loan-advance",
-    icon: DollarSign,
-  },
-  {
-    title: "Leave",
-    url: "/leave",
-    icon: Calendar,
-  },
-  {
-    title: "Overtime",
-    url: "/overtime",
-    icon: Clock,
-  },
-
-  {
-    title: "Change Shift",
-    url: "/change-shift",
-    icon: RefreshCw,
-  },
-
-  {
-    title: "Advance Salary",
-    url: "/wallet",
-    icon: Wallet,
+    title: "Change Password",
+    url: "/change-password",
+    icon: Settings,
   },
 ];
 
@@ -109,14 +106,16 @@ interface AppLayoutProps {
 
 interface DropdownMenuItemProps {
   label: string;
+  icon?: React.ComponentType<{ className?: string }>;
   items: Array<{
     title: string;
     url: string;
     icon?: React.ComponentType<{ className?: string }>;
+    count?: number;
   }>;
 }
 
-function DropdownMenuItem({ label, items }: DropdownMenuItemProps) {
+function DropdownMenuItem({ label, icon: Icon, items }: DropdownMenuItemProps) {
   const pathname = usePathname();
   const isChildActive = items.some((item) => pathname === item.url);
   const [isOpen, setIsOpen] = useState(isChildActive);
@@ -130,7 +129,7 @@ function DropdownMenuItem({ label, items }: DropdownMenuItemProps) {
   return (
     <SidebarMenuItem>
       <SidebarMenuButton onClick={() => setIsOpen(!isOpen)}>
-        <Users className='h-4 w-4' />
+        {Icon && <Icon className='h-4 w-4' />}
         <span>{label}</span>
         <ChevronDown
           className={`ml-auto h-4 w-4 transition-transform ${
@@ -143,9 +142,14 @@ function DropdownMenuItem({ label, items }: DropdownMenuItemProps) {
           {items.map((subItem) => (
             <SidebarMenuSubItem key={subItem.title}>
               <SidebarMenuSubButton asChild>
-                <a href={subItem.url}>
+                <a href={subItem.url} className='flex items-center w-full'>
                   {subItem.icon && <subItem.icon className='h-4 w-4' />}
                   <span>{subItem.title}</span>
+                  {subItem.count !== undefined && (
+                    <span className='ml-auto text-xs font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded'>
+                      {subItem.count}
+                    </span>
+                  )}
                 </a>
               </SidebarMenuSubButton>
             </SidebarMenuSubItem>
@@ -184,6 +188,7 @@ export function AppSidebar({
                     <DropdownMenuItem
                       key={item.label}
                       label={item.label}
+                      icon={item.icon}
                       items={item.items}
                     />
                   );

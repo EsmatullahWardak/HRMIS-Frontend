@@ -136,7 +136,7 @@ export default function LeavePage() {
 
       // Download ALL leaves for the selected month
       const url = `${API}/leave/report/monthly/export-all?month=${encodeURIComponent(
-        reportMonth
+        reportMonth,
       )}`;
 
       const res = await fetch(url);
