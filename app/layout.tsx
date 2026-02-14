@@ -52,6 +52,8 @@ const [theme, setTheme] = useState<"light" | "dark">("light");
     setLoading(false);
   }, [pathname, router, showSidebar]);
 
+  
+
   const handleLogout = () => {
     logout();
     setCurrentUser(null);
