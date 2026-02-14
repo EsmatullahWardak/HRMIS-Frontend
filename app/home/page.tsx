@@ -27,12 +27,18 @@ function SummaryCard({
   variant: "green" | "amber" | "rose" | "blue" | "orange" | "purple";
 }) {
   const variants = {
-    green: "bg-[#ecfdf5] text-[#059669] border-[#d1fae5]",
-    amber: "bg-[#fffbeb] text-[#d97706] border-[#fef3c7]",
-    rose: "bg-[#fff1f2] text-[#e11d48] border-[#ffe4e6]",
-    blue: "bg-[#eff6ff] text-[#2563eb] border-[#dbeafe]",
-    orange: "bg-[#fff7ed] text-[#ea580c] border-[#ffedd5]",
-    purple: "bg-[#faf5ff] text-[#9333ea] border-[#f3e8ff]",
+    green:
+      "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-900/60",
+    amber:
+      "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/40 dark:text-amber-200 dark:border-amber-900/60",
+    rose:
+      "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/40 dark:text-rose-200 dark:border-rose-900/60",
+    blue:
+      "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/40 dark:text-blue-200 dark:border-blue-900/60",
+    orange:
+      "bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-950/40 dark:text-orange-200 dark:border-orange-900/60",
+    purple:
+      "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/40 dark:text-purple-200 dark:border-purple-900/60",
   };
 
   return (
@@ -40,7 +46,7 @@ function SummaryCard({
       className={`p-4 rounded-xl border ${variants[variant]} flex flex-col gap-2 shadow-sm`}
     >
       <div className="flex items-center gap-2">
-        <div className="p-1.5 rounded-lg bg-white/50">
+        <div className="p-1.5 rounded-lg bg-background/50 dark:bg-white/5">
           <Icon className="h-4 w-4" />
         </div>
         <span className="text-[10px] font-bold uppercase tracking-wider">
@@ -91,8 +97,8 @@ export default function HomePage() {
       {/* 1. Header Section */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">Attendance Calendar</h1>
-          <p className="text-slate-500 text-sm">Track your daily attendance records and patterns</p>
+          <h1 className="text-2xl font-bold text-foreground">Attendance Calendar</h1>
+          <p className="text-muted-foreground text-sm">Track your daily attendance records and patterns</p>
         </div>
       </div>
 
@@ -104,22 +110,22 @@ export default function HomePage() {
       </div>
 
       {/* 3. Calendar Card Section */}
-      <div className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
+      <div className="bg-card p-6 rounded-2xl border border-border shadow-sm">
         {/* Navigation Header */}
         <div className="flex flex-col md:flex-row items-center justify-between mb-8 gap-4">
-          <Button variant="outline" size="sm" className="rounded-xl border-slate-200 gap-2 px-4">
-            <CalendarIconIcon className="h-4 w-4 text-slate-500" />
-            <span className="font-semibold text-slate-700">Today</span>
+          <Button variant="outline" size="sm" className="rounded-xl border-border gap-2 px-4">
+            <CalendarIconIcon className="h-4 w-4 text-muted-foreground" />
+            <span className="font-semibold text-foreground">Today</span>
           </Button>
 
-          <div className="flex items-center bg-slate-50 rounded-xl p-1 border border-slate-100">
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+          <div className="flex items-center bg-muted rounded-xl p-1 border border-border">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
               <ChevronLeft className="h-4 w-4" />
             </Button>
-            <div className="px-6 font-semibold text-slate-700 min-w-[150px] text-center">
+            <div className="px-6 font-semibold text-foreground min-w-[150px] text-center">
               January 2026
             </div>
-            <Button variant="ghost" size="icon" className="h-8 w-8 text-slate-400 hover:text-slate-600">
+            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-foreground">
               <ChevronRight className="h-4 w-4" />
             </Button>
           </div>
@@ -128,7 +134,7 @@ export default function HomePage() {
         {/* Days Header */}
         <div className="grid grid-cols-7 gap-4 mb-6">
           {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day) => (
-            <div key={day} className="text-center text-[11px] font-bold text-slate-400 tracking-widest py-2">
+            <div key={day} className="text-center text-[11px] font-bold text-muted-foreground tracking-widest py-2">
               {day}
             </div>
           ))}
@@ -142,12 +148,12 @@ export default function HomePage() {
               className={`h-24 rounded-2xl border relative flex items-center justify-center font-bold text-lg transition-all
                 ${
                   item.status === "other"
-                    ? "bg-slate-50/50 border-dashed border-slate-200 text-slate-300"
+                    ? "bg-muted/50 border-dashed border-border text-muted-foreground/60"
                     : item.status === "present"
-                    ? "bg-[#ecfdf5] border-[#d1fae5] text-[#059669] shadow-sm"
+                    ? "bg-emerald-50 border-emerald-100 text-emerald-700 shadow-sm dark:bg-emerald-950/40 dark:border-emerald-900/60 dark:text-emerald-200"
                     : item.status === "incomplete"
-                    ? "bg-[#fffbeb] border-[#fef3c7] text-[#d97706] shadow-sm"
-                    : "bg-[#fff1f2] border-dashed border-[#ffe4e6] text-[#e11d48] shadow-sm"
+                    ? "bg-amber-50 border-amber-100 text-amber-700 shadow-sm dark:bg-amber-950/40 dark:border-amber-900/60 dark:text-amber-200"
+                    : "bg-rose-50 border-dashed border-rose-100 text-rose-700 shadow-sm dark:bg-rose-950/40 dark:border-rose-900/60 dark:text-rose-200"
                 }`}
             >
               {item.day}
@@ -161,7 +167,7 @@ export default function HomePage() {
                 <Clock className="absolute top-2 right-2 h-4 w-4" />
               )}
               {item.status === "no-record" && (
-                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-slate-400 rounded-full"></div>
+                <div className="absolute bottom-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-muted-foreground rounded-full"></div>
               )}
             </div>
           ))}
@@ -170,29 +176,59 @@ export default function HomePage() {
 
       {/* 4. Legend Section */}
       <div className="flex flex-col gap-4">
-        <div className="flex items-center gap-2 text-slate-500 font-semibold text-sm">
+        <div className="flex items-center gap-2 text-muted-foreground font-semibold text-sm">
           <Sparkles className="h-4 w-4 text-purple-500" />
           Legend
         </div>
         <div className="flex flex-wrap gap-3">
           {[
-            { label: "Present", color: "bg-[#ecfdf5] text-[#059669] border-[#d1fae5]", icon: CheckCircle2 },
-            { label: "Incomplete", color: "bg-[#fffbeb] text-[#d97706] border-[#fef3c7]", icon: Clock },
-            { label: "No Records", color: "bg-[#fff1f2] text-[#e11d48] border-[#ffe4e6]", icon: XCircle },
-            { label: "Holiday", color: "bg-[#eff6ff] text-[#2563eb] border-[#dbeafe]", icon: CalendarIcon },
-            { label: "Leave", color: "bg-[#fff7ed] text-[#ea580c] border-[#ffedd5]", icon: Coffee },
-            { label: "Bonus Leave", color: "bg-[#faf5ff] text-[#9333ea] border-[#f3e8ff]", icon: Gift },
+            {
+              label: "Present",
+              color:
+                "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/40 dark:text-emerald-200 dark:border-emerald-900/60",
+              icon: CheckCircle2,
+            },
+            {
+              label: "Incomplete",
+              color:
+                "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/40 dark:text-amber-200 dark:border-amber-900/60",
+              icon: Clock,
+            },
+            {
+              label: "No Records",
+              color:
+                "bg-rose-50 text-rose-700 border-rose-100 dark:bg-rose-950/40 dark:text-rose-200 dark:border-rose-900/60",
+              icon: XCircle,
+            },
+            {
+              label: "Holiday",
+              color:
+                "bg-blue-50 text-blue-700 border-blue-100 dark:bg-blue-950/40 dark:text-blue-200 dark:border-blue-900/60",
+              icon: CalendarIcon,
+            },
+            {
+              label: "Leave",
+              color:
+                "bg-orange-50 text-orange-700 border-orange-100 dark:bg-orange-950/40 dark:text-orange-200 dark:border-orange-900/60",
+              icon: Coffee,
+            },
+            {
+              label: "Bonus Leave",
+              color:
+                "bg-purple-50 text-purple-700 border-purple-100 dark:bg-purple-950/40 dark:text-purple-200 dark:border-purple-900/60",
+              icon: Gift,
+            },
           ].map((item) => (
             <div key={item.label} className={`flex items-center gap-2 px-3 py-1.5 rounded-xl border text-xs font-bold ${item.color}`}>
               <item.icon className="h-3.5 w-3.5" />
               {item.label}
             </div>
           ))}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 bg-white text-xs font-bold text-slate-500">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border bg-card text-xs font-bold text-muted-foreground">
             <div className="w-2 h-2 rounded-full bg-blue-500" />
             Today
           </div>
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-100 bg-slate-50 text-xs font-bold text-slate-400">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl border border-border bg-muted text-xs font-bold text-muted-foreground">
             Other Month
           </div>
         </div>

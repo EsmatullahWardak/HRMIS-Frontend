@@ -100,10 +100,6 @@ export default function RootLayout({
                 <header className='border-b border-border p-4 flex items-center justify-between'>
                   <SidebarTrigger />
                   <div className='flex items-center gap-4'>
-                    {/* 1. Bell Icon */}
-                    <button className='text-slate-400 hover:text-slate-600 transition-colors mr-2'>
-                      <Bell className='h-5 w-5' />
-                    </button>
                     <button
                       onClick={toggleTheme}
                       className='text-slate-400 hover:text-slate-600 transition-colors'
@@ -114,6 +110,10 @@ export default function RootLayout({
                       ) : (
                         <Moon className='h-5 w-5' />
                       )}
+                    </button>
+                    {/* 1. Bell Icon */}
+                    <button className='text-slate-400 hover:text-slate-600 transition-colors mr-2'>
+                      <Bell className='h-5 w-5' />
                     </button>
 
                     {/* 2. Avatar Circle */}
