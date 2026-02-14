@@ -27,8 +27,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [currentUser, setCurrentUser] = useState<any>(null);
-const [loading, setLoading] = useState(true);
-const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [loading, setLoading] = useState(true);
+  const [theme, setTheme] = useState<"light" | "dark">("light");
 
   const pathname = usePathname();
   const router = useRouter();
@@ -52,7 +52,20 @@ const [theme, setTheme] = useState<"light" | "dark">("light");
     setLoading(false);
   }, [pathname, router, showSidebar]);
 
-  
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme");
+    const initial = saved === "dark" ? "dark" : "light";
+    setTheme(initial);
+    document.documentElement.classList.toggle("dark", initial === "dark");
+  }, []);
+
+  const toggleTheme = () => {
+    const next = theme === "dark" ? "light" : "dark";
+    setTheme(next);
+    localStorage.setItem("theme", next);
+    document.documentElement.classList.toggle("dark", next === "dark");
+  };
 
   const handleLogout = () => {
     logout();
@@ -77,19 +90,30 @@ const [theme, setTheme] = useState<"light" | "dark">("light");
   return (
     <html lang='en' suppressHydrationWarning>
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-slate-50`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background`}
       >
         {showSidebar ? (
           <SidebarProvider>
             <div className='flex h-screen w-full max-w-[1400px] mx-auto p-4 gap-4 overflow-hidden'>
               <AppSidebar currentUser={currentUser} onLogout={handleLogout} />
-              <main className='flex-1 flex flex-col overflow-hidden bg-white border border-slate-200 rounded-2xl shadow-sm'>
-                <header className='border-b border-slate-100 p-4 flex items-center justify-between'>
+              <main className='flex-1 flex flex-col overflow-hidden bg-card border border-border rounded-2xl shadow-sm'>
+                <header className='border-b border-border p-4 flex items-center justify-between'>
                   <SidebarTrigger />
                   <div className='flex items-center gap-4'>
                     {/* 1. Bell Icon */}
                     <button className='text-slate-400 hover:text-slate-600 transition-colors mr-2'>
                       <Bell className='h-5 w-5' />
+                    </button>
+                    <button
+                      onClick={toggleTheme}
+                      className='text-slate-400 hover:text-slate-600 transition-colors'
+                      title='Toggle theme'
+                    >
+                      {theme === "dark" ? (
+                        <Sun className='h-5 w-5' />
+                      ) : (
+                        <Moon className='h-5 w-5' />
+                      )}
                     </button>
 
                     {/* 2. Avatar Circle */}
