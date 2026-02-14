@@ -8,7 +8,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { isAuthenticated, getUserFromToken, logout } from "@/lib/auth";
-import { Bell, ChevronDown } from "lucide-react";
+import { Bell, ChevronDown, Sun, Moon } from "lucide-react";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +27,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const [currentUser, setCurrentUser] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+const [loading, setLoading] = useState(true);
+const [theme, setTheme] = useState<"light" | "dark">("light");
+
   const pathname = usePathname();
   const router = useRouter();
 
