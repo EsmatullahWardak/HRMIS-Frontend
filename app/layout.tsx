@@ -28,7 +28,8 @@ export default function RootLayout({
 }>) {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [theme, setTheme] = useState<"light" | "dark">("light");
+  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
+
 
   const pathname = usePathname();
   const router = useRouter();
@@ -54,17 +55,39 @@ export default function RootLayout({
 
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme");
-    const initial = saved === "dark" ? "dark" : "light";
+    const saved = localStorage.getItem("theme") as
+      | "light"
+      | "dark"
+      | "system"
+      | null;
+    const initial = saved ?? "system";
     setTheme(initial);
-    document.documentElement.classList.toggle("dark", initial === "dark");
+    const isDark =
+      initial === "dark" ||
+      (initial === "system" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.classList.toggle("dark", isDark);
   }, []);
 
-  const toggleTheme = () => {
-    const next = theme === "dark" ? "light" : "dark";
-    setTheme(next);
-    localStorage.setItem("theme", next);
-    document.documentElement.classList.toggle("dark", next === "dark");
+  useEffect(() => {
+    if (theme !== "system") return;
+    const media = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => {
+      document.documentElement.classList.toggle("dark", media.matches);
+    };
+    handleChange();
+    media.addEventListener("change", handleChange);
+    return () => media.removeEventListener("change", handleChange);
+  }, [theme]);
+
+  const setThemeMode = (mode: "light" | "dark" | "system") => {
+    setTheme(mode);
+    localStorage.setItem("theme", mode);
+    const isDark =
+      mode === "dark" ||
+      (mode === "system" &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
+    document.documentElement.classList.toggle("dark", isDark);
   };
 
   const handleLogout = () => {
@@ -100,17 +123,40 @@ export default function RootLayout({
                 <header className='border-b border-border p-4 flex items-center justify-between'>
                   <SidebarTrigger />
                   <div className='flex items-center gap-4'>
-                    <button
-                      onClick={toggleTheme}
-                      className='text-slate-400 hover:text-slate-600 transition-colors'
-                      title='Toggle theme'
-                    >
-                      {theme === "dark" ? (
-                        <Sun className='h-5 w-5' />
-                      ) : (
-                        <Moon className='h-5 w-5' />
-                      )}
-                    </button>
+                    <div className='relative group'>
+                      <button
+                        className='text-slate-400 hover:text-slate-600 transition-colors'
+                        title='Theme'
+                      >
+                        {theme === "dark" ? (
+                          <Moon className='h-5 w-5' />
+                        ) : theme === "light" ? (
+                          <Sun className='h-5 w-5' />
+                        ) : (
+                          <Sun className='h-5 w-5' />
+                        )}
+                      </button>
+                      <div className='absolute right-0 mt-2 w-32 rounded-lg border border-border bg-card shadow-md opacity-0 group-hover:opacity-100 transition-opacity'>
+                        <button
+                          onClick={() => setThemeMode("light")}
+                          className='w-full text-left px-3 py-2 text-sm hover:bg-muted'
+                        >
+                          Light
+                        </button>
+                        <button
+                          onClick={() => setThemeMode("dark")}
+                          className='w-full text-left px-3 py-2 text-sm hover:bg-muted'
+                        >
+                          Dark
+                        </button>
+                        <button
+                          onClick={() => setThemeMode("system")}
+                          className='w-full text-left px-3 py-2 text-sm hover:bg-muted'
+                        >
+                          System
+                        </button>
+                      </div>
+                    </div>
                     {/* 1. Bell Icon */}
                     <button className='text-slate-400 hover:text-slate-600 transition-colors mr-2'>
                       <Bell className='h-5 w-5' />
