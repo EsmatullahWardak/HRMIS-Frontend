@@ -84,15 +84,15 @@ export function LoanAdvanceContent() {
     }
   };
   return (
-    <div className='min-h-screen bg-white p-6'>
+    <div className='min-h-screen bg-card p-6'>
       {/* Header */}
       <div className='flex justify-between items-start mb-8'>
         <div>
           <div className='flex items-center gap-2'>
-            <DollarSign className='h-6 w-6 text-gray-700' />
-            <h1 className='text-2xl font-bold text-gray-800'>My Loans</h1>
+            <DollarSign className='h-6 w-6 text-foreground' />
+            <h1 className='text-2xl font-bold text-foreground'>My Loans</h1>
           </div>
-          <p className='text-gray-500 mt-1'>
+          <p className='text-muted-foreground mt-1'>
             Manage and track your loan applications
           </p>
         </div>
@@ -114,23 +114,23 @@ export function LoanAdvanceContent() {
       {/* Modal */}
       {isModalOpen && (
         <div className='fixed inset-0 bg-black/20 backdrop-blur-[2px] flex items-center justify-center z-50'>
-          <div className='bg-white rounded-lg w-full max-w-2xl p-6 shadow-2xl'>
+          <div className='bg-card rounded-lg w-full max-w-2xl p-6 shadow-2xl'>
             {/* Modal Header */}
             <div className='flex justify-between items-center mb-6'>
-              <h2 className='text-xl text-gray-800 font-semibold'>
+              <h2 className='text-xl text-foreground font-semibold'>
                 Request a Loan
               </h2>
               <button onClick={() => setIsModalOpen(false)}>
-                <X className='h-6 w-6 text-gray-500 hover:text-gray-800' />
+                <X className='h-6 w-6 text-muted-foreground hover:text-foreground' />
               </button>
             </div>
 
             {/* Loan Application */}
             <div className='mb-4'>
-              <h3 className='text-lg text-gray-800 font-semibold'>
+              <h3 className='text-lg text-foreground font-semibold'>
                 Loan Application
               </h3>
-              <p className='text-gray-500 text-sm'>
+              <p className='text-muted-foreground text-sm'>
                 Select loan type and fill the details
               </p>
             </div>
@@ -142,18 +142,18 @@ export function LoanAdvanceContent() {
             />
 
             {/* Selected Loan Info */}
-            <div className='bg-gray-100 border border-gray-200 rounded-lg p-4 mb-4'>
+            <div className='bg-muted border border-border rounded-lg p-4 mb-4'>
               <div className='flex items-center gap-2'>
-                <Calendar className='h-5 w-5 text-gray-700' />
+                <Calendar className='h-5 w-5 text-foreground' />
                 <div>
-                  <p className='font-semibold text-gray-800'>
+                  <p className='font-semibold text-foreground'>
                     {selectedLoanType === "100"
                       ? "100$ Loan"
                       : selectedLoanType === "1month"
                       ? "1 Month"
                       : "3 Month"}
                   </p>
-                  <p className='text-sm text-gray-500'>
+                  <p className='text-sm text-muted-foreground'>
                     {selectedLoanType === "100"
                       ? "Full salary advance"
                       : "Short-term loan"}
@@ -193,10 +193,10 @@ export function LoanAdvanceContent() {
 
             {/* Additional Notes */}
             <div className='mb-6'>
-              <label className='text-sm text-gray-500'>Additional Notes</label>
+              <label className='text-sm text-muted-foreground'>Additional Notes</label>
               <textarea
                 placeholder='Any additional information...'
-                className='w-full bg-gray-100 border border-gray-200 rounded-lg p-3 mt-1 text-gray-800 placeholder-gray-400 resize-none'
+                className='w-full bg-muted border border-border rounded-lg p-3 mt-1 text-foreground placeholder:text-muted-foreground resize-none'
                 rows={3}
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
@@ -205,9 +205,9 @@ export function LoanAdvanceContent() {
 
             {/* Footer */}
             <div className='flex justify-between items-center'>
-              <p className='text-sm text-gray-600'>
+              <p className='text-sm text-muted-foreground'>
                 Applying for:{" "}
-                <span className='bg-gray-200 text-gray-800 px-2 py-1 rounded'>
+                <span className='bg-muted text-foreground px-2 py-1 rounded'>
                   {selectedLoanType === "100"
                     ? "100$ Loan"
                     : selectedLoanType === "1month"

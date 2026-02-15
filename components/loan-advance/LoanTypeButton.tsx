@@ -15,8 +15,8 @@ export function LoanTypeButtons({
         onClick={() => onSelectLoanType("100")}
         className={`px-6 py-2 rounded-full flex items-center gap-2 ${
           selectedLoanType === "100"
-            ? "border-2 border-gray-400 text-gray-800"
-            : "text-gray-500"
+            ? "border-2 border-border text-foreground"
+            : "text-muted-foreground"
         }`}
       >
         <DollarSign className='h-4 w-4' /> 100$ Loan
@@ -25,8 +25,8 @@ export function LoanTypeButtons({
         onClick={() => onSelectLoanType("1month")}
         className={`px-6 py-2 rounded-full flex items-center gap-2 ${
           selectedLoanType === "1month"
-            ? "border-2 border-gray-400 text-gray-800"
-            : "text-gray-500"
+            ? "border-2 border-border text-foreground"
+            : "text-muted-foreground"
         }`}
       >
         <Calendar className='h-4 w-4' /> 1 Month
@@ -35,8 +35,8 @@ export function LoanTypeButtons({
         onClick={() => onSelectLoanType("3month")}
         className={`px-6 py-2 rounded-full flex items-center gap-2 ${
           selectedLoanType === "3month"
-            ? "border-2 border-gray-400 text-gray-800"
-            : "text-gray-500"
+            ? "border-2 border-border text-foreground"
+            : "text-muted-foreground"
         }`}
       >
         <Calendar className='h-4 w-4' /> 3 Month

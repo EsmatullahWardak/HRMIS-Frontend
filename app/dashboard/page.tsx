@@ -28,7 +28,7 @@ export default function DashboardPage() {
       <h1 className='text-3xl font-bold'>Dashboard</h1>
 
       {/* Users Bar Chart */}
-      <div className='bg-white p-6 rounded-lg shadow'>
+      <div className='bg-card p-6 rounded-lg shadow'>
         <h2 className='text-xl font-semibold mb-4'>Users Overview</h2>
         <ResponsiveContainer width='100%' height={300}>
           <BarChart data={userData}>
@@ -43,7 +43,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Products Bar Chart */}
-      <div className='bg-white p-6 rounded-lg shadow'>
+      <div className='bg-card p-6 rounded-lg shadow'>
         <h2 className='text-xl font-semibold mb-4'>Products Overview</h2>
         <ResponsiveContainer width='100%' height={300}>
           <BarChart data={productData}>

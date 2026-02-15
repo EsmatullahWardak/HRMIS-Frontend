@@ -29,6 +29,7 @@ export default function RootLayout({
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
+  const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
 
   const pathname = usePathname();
@@ -54,26 +55,45 @@ export default function RootLayout({
   }, [pathname, router, showSidebar]);
 
 
+  const applyTheme = (mode: "light" | "dark" | "system") => {
+    setTheme(mode);
+    const resolved =
+      mode === "system"
+        ? window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "dark"
+          : "light"
+        : mode;
+    setResolvedTheme(resolved);
+    document.documentElement.classList.toggle("dark", resolved === "dark");
+  };
+
   useEffect(() => {
     const saved = localStorage.getItem("theme") as
       | "light"
       | "dark"
       | "system"
       | null;
-    const initial = saved ?? "system";
-    setTheme(initial);
-    const isDark =
-      initial === "dark" ||
-      (initial === "system" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
-    document.documentElement.classList.toggle("dark", isDark);
+    applyTheme(saved ?? "system");
+  }, []);
+
+  useEffect(() => {
+    const handleStorage = (event: StorageEvent) => {
+      if (event.key !== "theme") return;
+      const value =
+        (event.newValue as "light" | "dark" | "system" | null) ?? "system";
+      applyTheme(value);
+    };
+    window.addEventListener("storage", handleStorage);
+    return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
   useEffect(() => {
     if (theme !== "system") return;
     const media = window.matchMedia("(prefers-color-scheme: dark)");
     const handleChange = () => {
-      document.documentElement.classList.toggle("dark", media.matches);
+      const resolved = media.matches ? "dark" : "light";
+      setResolvedTheme(resolved);
+      document.documentElement.classList.toggle("dark", resolved === "dark");
     };
     handleChange();
     media.addEventListener("change", handleChange);
@@ -81,13 +101,8 @@ export default function RootLayout({
   }, [theme]);
 
   const setThemeMode = (mode: "light" | "dark" | "system") => {
-    setTheme(mode);
     localStorage.setItem("theme", mode);
-    const isDark =
-      mode === "dark" ||
-      (mode === "system" &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches);
-    document.documentElement.classList.toggle("dark", isDark);
+    applyTheme(mode);
   };
 
   const handleLogout = () => {
@@ -98,9 +113,13 @@ export default function RootLayout({
 
   if (loading && showSidebar) {
     return (
-      <html lang='en'>
+      <html
+        lang='en'
+        suppressHydrationWarning
+        className={resolvedTheme === "dark" ? "dark" : ""}
+      >
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background`}
         >
           <div className='flex items-center justify-center min-h-screen'>
             <p className='text-lg'>Loading...</p>
@@ -111,7 +130,11 @@ export default function RootLayout({
   }
 
   return (
-    <html lang='en' suppressHydrationWarning>
+    <html
+      lang='en'
+      suppressHydrationWarning
+      className={resolvedTheme === "dark" ? "dark" : ""}
+    >
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background`}
       >
@@ -125,7 +148,7 @@ export default function RootLayout({
                   <div className='flex items-center gap-4'>
                     <div className='relative group'>
                       <button
-                        className='text-slate-400 hover:text-slate-600 transition-colors'
+                        className='text-muted-foreground hover:text-foreground transition-colors'
                         title='Theme'
                       >
                         {theme === "dark" ? (
@@ -158,7 +181,7 @@ export default function RootLayout({
                       </div>
                     </div>
                     {/* 1. Bell Icon */}
-                    <button className='text-slate-400 hover:text-slate-600 transition-colors mr-2'>
+                    <button className='text-muted-foreground hover:text-foreground transition-colors mr-2'>
                       <Bell className='h-5 w-5' />
                     </button>
 
@@ -172,14 +195,14 @@ export default function RootLayout({
                         {" "}
                         {currentUser?.name || "Esmatullah Wardak"}
                       </span>
-                      <span className='text-xs text-slate-500 truncate w-full'>
+                      <span className='text-xs text-muted-foreground truncate w-full'>
                         {" "}
                         {currentUser?.email ||
                           "esmatullah.wardak2020@gmail.com"}
                       </span>
                     </div>
 
-                    <ChevronDown className='h-4 w-4 text-slate-400 ml-1' />
+                    <ChevronDown className='h-4 w-4 text-muted-foreground ml-1' />
                   </div>
                 </header>
 

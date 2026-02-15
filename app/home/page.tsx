@@ -46,7 +46,7 @@ function SummaryCard({
       className={`p-4 rounded-xl border ${variants[variant]} flex flex-col gap-2 shadow-sm`}
     >
       <div className="flex items-center gap-2">
-        <div className="p-1.5 rounded-lg bg-background/50 dark:bg-white/5">
+        <div className="p-1.5 rounded-lg bg-background/50 dark:bg-card/5">
           <Icon className="h-4 w-4" />
         </div>
         <span className="text-[10px] font-bold uppercase tracking-wider">

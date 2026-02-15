@@ -86,7 +86,7 @@ function DropdownMenuItem({ label, icon: Icon, items }: DropdownMenuItemProps) {
                   {subItem.icon && <subItem.icon className='h-4 w-4' />}
                   <span>{subItem.title}</span>
                   {subItem.count !== undefined && (
-                    <span className='ml-auto text-xs font-medium text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded'>
+                    <span className='ml-auto text-xs font-medium text-muted-foreground bg-muted px-1.5 py-0.5 rounded'>
                       {subItem.count}
                     </span>
                   )}
@@ -110,7 +110,7 @@ export function AppSidebar({
   return (
     <Sidebar variant='floating'>
       <SidebarHeader>
-        <div className='flex items-center gap-2 px-4 py-2 border-b border-slate-150'>
+        <div className='flex items-center gap-2 px-4 py-2 border-b border-border'>
           <div className='flex items-center'>
             <img src='/logo.png' alt='HRMIS Logo' className='h-10' />
           </div>
@@ -149,7 +149,7 @@ export function AppSidebar({
         </SidebarGroup>
       </SidebarContent>
 
-      <SidebarFooter className='mt-auto border-t border-slate-50 p-2'>
+      <SidebarFooter className='mt-auto border-t border-border p-2'>
         {onLogout && (
           <Button
             variant='ghost'
@@ -173,7 +173,7 @@ export default function AppLayout({
 }: AppLayoutProps) {
   return (
     <SidebarProvider>
-      <div className='flex h-screen w-full p-4 gap-4 bg-slate-50'>
+      <div className='flex h-screen w-full p-4 gap-4 bg-background'>
         <AppSidebar currentUser={currentUser} onLogout={onLogout} />
         <main className='flex-1 flex flex-col overflow-hidden'>
           <header className='border-b p-4'>

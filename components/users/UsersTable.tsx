@@ -38,7 +38,7 @@ export default function UsersTable({
         )}
 
         {users.length === 0 ? (
-          <p className='text-gray-500 text-center py-8'>No users found.</p>
+          <p className='text-muted-foreground text-center py-8'>No users found.</p>
         ) : (
           <div className='overflow-x-auto'>
             <div className='flex justify-end mb-4'>
@@ -58,7 +58,7 @@ export default function UsersTable({
               </thead>
               <tbody>
                 {users.map((user) => (
-                  <tr key={user.id} className='border-b hover:bg-gray-50'>
+                  <tr key={user.id} className='border-b hover:bg-background'>
                     <td className='p-3'>{user.id}</td>
                     <td className='p-3'>{user.name || "N/A"}</td>
                     <td className='p-3'>{user.email}</td>

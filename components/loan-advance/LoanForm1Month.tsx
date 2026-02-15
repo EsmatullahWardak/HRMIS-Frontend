@@ -28,9 +28,9 @@ export function LoanForm1Month({
 
   return (
     <div className='mb-4'>
-      <label className='text-sm text-gray-500'>Monthly Deduction *</label>
-      <div className='bg-white border border-gray-300 rounded-lg p-3 mt-1 flex items-center gap-2'>
-        <span className='text-gray-500'>$</span>
+      <label className='text-sm text-muted-foreground'>Monthly Deduction *</label>
+      <div className='bg-card border border-border rounded-lg p-3 mt-1 flex items-center gap-2'>
+        <span className='text-muted-foreground'>$</span>
         <input
           type='text'
           inputMode='decimal'
@@ -42,13 +42,13 @@ export function LoanForm1Month({
               onMonthlyDeductionChange(value);
             }
           }}
-          className='flex-1 bg-transparent text-gray-800 outline-none'
+          className='flex-1 bg-transparent text-foreground outline-none'
           autoComplete='off'
         />
       </div>
 
-      <label className='text-sm text-gray-500 mt-4 block'>
-        Repayment Month * <span className='text-gray-400'>(Select 1)</span>
+      <label className='text-sm text-muted-foreground mt-4 block'>
+        Repayment Month * <span className='text-muted-foreground'>(Select 1)</span>
       </label>
       <div className='flex flex-wrap gap-2 mt-2'>
         {months.map((month) => (
@@ -57,8 +57,8 @@ export function LoanForm1Month({
             onClick={() => onSelectedMonthChange(month)}
             className={`px-3 py-1 rounded-full text-sm ${
               selectedMonth === month
-                ? "bg-gray-800 text-white"
-                : "bg-white text-gray-600 border border-gray-300"
+                ? "bg-primary text-primary-foreground"
+                : "bg-card text-muted-foreground border border-border"
             }`}
           >
             {month}

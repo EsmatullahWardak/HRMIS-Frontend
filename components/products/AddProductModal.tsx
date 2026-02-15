@@ -166,7 +166,7 @@ export default function AddProductModal({
               type='checkbox'
               checked={formData.isActive}
               onChange={handleChange}
-              className='h-4 w-4 rounded border-gray-300'
+              className='h-4 w-4 rounded border-border'
             />
             <Label htmlFor='isActive' className='cursor-pointer'>
               Active Product

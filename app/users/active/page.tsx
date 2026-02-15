@@ -113,21 +113,21 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className='flex items-center justify-center min-h-screen bg-gray-50'>
+      <div className='flex items-center justify-center min-h-screen bg-background'>
         <p className='text-lg'>Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className='min-h-screen bg-gray-50 p-8'>
+    <div className='min-h-screen bg-background p-8'>
       <div className='max-w-6xl mx-auto'>
         <div className='flex justify-between items-center mb-8'>
           <div>
-            <h1 className='text-3xl font-bold text-gray-800'>
+            <h1 className='text-3xl font-bold text-foreground'>
               Welcome, {currentUser?.name || "User"}! 👋
             </h1>
-            <p className='text-gray-600 mt-1'>
+            <p className='text-muted-foreground mt-1'>
               Logged in as: {currentUser?.email}
             </p>
           </div>
@@ -151,7 +151,7 @@ export default function HomePage() {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className='text-sm text-gray-600'>{user.email}</p>
+                  <p className='text-sm text-muted-foreground'>{user.email}</p>
                 </CardContent>
               </Card>
             ))}
