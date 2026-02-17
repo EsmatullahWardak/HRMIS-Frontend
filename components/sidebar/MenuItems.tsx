@@ -24,15 +24,21 @@ const menuItems = [
     items: [
       {
         title: "users",
-        url: "/dashboard/users",
+        url: "/users/active",
         icon: Users,
         // count: 4891,
       },
       {
         title: "Active Users",
-        url: "/dashboard/active-users",
+        url: "/users/active",
         icon: UserCheck,
         // count: 3501,
+      },
+      {
+        title: "Inactive Users",
+        url: "/users/inactive",
+        icon: UserCheck,
+        // count: 0,
       },
 
       {
