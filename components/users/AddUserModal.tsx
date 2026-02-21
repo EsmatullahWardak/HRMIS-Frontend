@@ -26,6 +26,9 @@ export default function AddUserModal({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isActive, setIsActive] = useState(true);
+  const [role, setRole] = useState<"ADMIN" | "OFFICER" | "EMPLOYEE">(
+    "EMPLOYEE"
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -40,6 +43,7 @@ export default function AddUserModal({
         email,
         password,
         is_active: isActive,
+        role,
       });
 
       // Reset form
@@ -47,6 +51,7 @@ export default function AddUserModal({
       setEmail("");
       setPassword("");
       setIsActive(true);
+      setRole("EMPLOYEE");
 
       onUserAdded(); // Refresh the user list
       onClose(); // Close the modal
@@ -103,6 +108,21 @@ export default function AddUserModal({
               type='password'
               required
             />
+          </div>
+
+          <div>
+            <label className='block text-sm font-medium mb-1'>Role</label>
+            <select
+              value={role}
+              onChange={(e) =>
+                setRole(e.target.value as "ADMIN" | "OFFICER" | "EMPLOYEE")
+              }
+              className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            >
+              <option value='EMPLOYEE'>Employee</option>
+              <option value='OFFICER'>Officer</option>
+              <option value='ADMIN'>Admin</option>
+            </select>
           </div>
 
           <div>

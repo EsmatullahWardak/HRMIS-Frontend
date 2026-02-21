@@ -8,6 +8,7 @@ export interface User {
   email: string;
   createdAt: string;
   is_active: boolean;
+  role: "ADMIN" | "OFFICER" | "EMPLOYEE";
 }
 
 export const getActiveUsers = async () => {

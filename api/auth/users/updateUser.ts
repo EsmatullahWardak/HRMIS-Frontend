@@ -4,7 +4,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
 
 export const updateUser = async (
   userId: number,
-  userData: { name: string; email: string; is_active?: boolean }
+  userData: {
+    name: string;
+    email: string;
+    is_active?: boolean;
+    role?: "ADMIN" | "OFFICER" | "EMPLOYEE";
+  }
 ) => {
   try {
     const token = localStorage.getItem("auth_token");

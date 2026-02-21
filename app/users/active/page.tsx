@@ -27,11 +27,15 @@ export default function UsersPage() {
     total: 0,
     active: 0,
     inactive: 0,
+    admins: 0,
+    officers: 0,
+    employees: 0,
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
+  const [role, setRole] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -52,6 +56,7 @@ export default function UsersPage() {
         limit: PAGE_SIZE,
         search,
         status,
+        role,
       });
       setUsers(response.data);
       setTotalPages(Math.max(1, response.meta.totalPages));
@@ -61,7 +66,7 @@ export default function UsersPage() {
     } finally {
       setLoading(false);
     }
-  }, [page, search, status]);
+  }, [page, search, status, role]);
 
   useEffect(() => {
     if (!isAuthenticated()) {
@@ -74,7 +79,7 @@ export default function UsersPage() {
 
   useEffect(() => {
     setPage(1);
-  }, [search, status]);
+  }, [search, status, role]);
 
   const filteredCount = useMemo(() => users.length, [users]);
 
@@ -91,7 +96,12 @@ export default function UsersPage() {
 
   const handleSaveUser = async (
     userId: number,
-    userData: { name: string; email: string; is_active: boolean }
+    userData: {
+      name: string;
+      email: string;
+      is_active: boolean;
+      role: "ADMIN" | "OFFICER" | "EMPLOYEE";
+    }
   ) => {
     try {
       await updateUser(userId, userData);
@@ -121,7 +131,7 @@ export default function UsersPage() {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-6">
         <Card>
           <CardContent className="p-5">
             <p className="text-sm text-muted-foreground">Total</p>
@@ -142,6 +152,24 @@ export default function UsersPage() {
             <p className="text-3xl font-semibold text-amber-600">
               {summary.inactive}
             </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-5">
+            <p className="text-sm text-muted-foreground">Admins</p>
+            <p className="text-3xl font-semibold text-violet-600">{summary.admins}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-5">
+            <p className="text-sm text-muted-foreground">Officers</p>
+            <p className="text-3xl font-semibold text-blue-600">{summary.officers}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-5">
+            <p className="text-sm text-muted-foreground">Employees</p>
+            <p className="text-3xl font-semibold text-slate-700">{summary.employees}</p>
           </CardContent>
         </Card>
         <Card>
@@ -170,6 +198,16 @@ export default function UsersPage() {
               <option value="active">Active</option>
               <option value="inactive">Inactive</option>
             </select>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm md:w-44"
+            >
+              <option value="">All Roles</option>
+              <option value="ADMIN">Admin</option>
+              <option value="OFFICER">Officer</option>
+              <option value="EMPLOYEE">Employee</option>
+            </select>
           </div>
 
           {error && (
@@ -185,6 +223,7 @@ export default function UsersPage() {
                   <th className="px-4 py-3 text-left font-semibold">ID</th>
                   <th className="px-4 py-3 text-left font-semibold">Employee</th>
                   <th className="px-4 py-3 text-left font-semibold">Email</th>
+                  <th className="px-4 py-3 text-left font-semibold">Role</th>
                   <th className="px-4 py-3 text-left font-semibold">Status</th>
                   <th className="px-4 py-3 text-left font-semibold">Created At</th>
                   <th className="px-4 py-3 text-left font-semibold">Actions</th>
@@ -193,13 +232,13 @@ export default function UsersPage() {
               <tbody>
                 {loading ? (
                   <tr>
-                    <td className="px-4 py-8 text-center text-muted-foreground" colSpan={6}>
+                    <td className="px-4 py-8 text-center text-muted-foreground" colSpan={7}>
                       Loading users...
                     </td>
                   </tr>
                 ) : users.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-8 text-center text-muted-foreground" colSpan={6}>
+                    <td className="px-4 py-8 text-center text-muted-foreground" colSpan={7}>
                       No users found.
                     </td>
                   </tr>
@@ -209,6 +248,9 @@ export default function UsersPage() {
                       <td className="px-4 py-3">{user.id}</td>
                       <td className="px-4 py-3 font-medium">{user.name || "N/A"}</td>
                       <td className="px-4 py-3">{user.email}</td>
+                      <td className="px-4 py-3">
+                        <Badge variant="outline">{user.role}</Badge>
+                      </td>
                       <td className="px-4 py-3">
                         <Badge variant={user.is_active ? "default" : "secondary"}>
                           {user.is_active ? "Active" : "Inactive"}

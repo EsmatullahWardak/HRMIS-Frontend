@@ -17,6 +17,7 @@ interface User {
   email: string;
   createdAt: string;
   is_active: boolean;
+  role: "ADMIN" | "OFFICER" | "EMPLOYEE";
 }
 
 export default function InactiveUsersPage() {
@@ -52,7 +53,12 @@ export default function InactiveUsersPage() {
 
   const handleSaveUser = async (
     userId: number,
-    userData: { name: string; email: string; is_active: boolean }
+    userData: {
+      name: string;
+      email: string;
+      is_active: boolean;
+      role: "ADMIN" | "OFFICER" | "EMPLOYEE";
+    }
   ) => {
     try {
       await updateUser(userId, userData);

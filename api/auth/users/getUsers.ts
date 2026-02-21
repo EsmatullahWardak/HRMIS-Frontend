@@ -8,6 +8,7 @@ export interface User {
   email: string;
   createdAt: string;
   is_active: boolean;
+  role: "ADMIN" | "OFFICER" | "EMPLOYEE";
 }
 
 export interface UsersResponse {
@@ -24,6 +25,9 @@ export interface UsersSummary {
   total: number;
   active: number;
   inactive: number;
+  admins: number;
+  officers: number;
+  employees: number;
 }
 
 const getAuthHeaders = () => {
@@ -38,6 +42,7 @@ export const getUsers = async (params: {
   limit?: number;
   search?: string;
   status?: string;
+  role?: string;
 }): Promise<UsersResponse> => {
   try {
     const response = await axios.get<UsersResponse>(`${API_URL}/users`, {

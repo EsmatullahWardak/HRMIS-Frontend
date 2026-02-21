@@ -15,6 +15,7 @@ interface User {
   name: string | null;
   email: string;
   is_active: boolean;
+  role: "ADMIN" | "OFFICER" | "EMPLOYEE";
 }
 
 interface EditUserModalProps {
@@ -23,7 +24,12 @@ interface EditUserModalProps {
   onClose: () => void;
   onSave: (
     userId: number,
-    userData: { name: string; email: string; is_active: boolean }
+    userData: {
+      name: string;
+      email: string;
+      is_active: boolean;
+      role: "ADMIN" | "OFFICER" | "EMPLOYEE";
+    }
   ) => void;
 }
 
@@ -36,18 +42,22 @@ export default function EditUserModal({
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [isActive, setIsActive] = useState(true);
+  const [role, setRole] = useState<"ADMIN" | "OFFICER" | "EMPLOYEE">(
+    "EMPLOYEE"
+  );
 
   useEffect(() => {
     if (user) {
       setName(user.name || "");
       setEmail(user.email || "");
       setIsActive(user.is_active);
+      setRole(user.role);
     }
   }, [user]);
 
   const handleSave = () => {
     if (user) {
-      onSave(user.id, { name, email, is_active: isActive });
+      onSave(user.id, { name, email, is_active: isActive, role });
       onClose();
     }
   };
@@ -76,6 +86,21 @@ export default function EditUserModal({
               type='email'
             />
           </div>
+          <div>
+            <label className='block text-sm font-medium mb-1'>Role</label>
+            <select
+              value={role}
+              onChange={(e) =>
+                setRole(e.target.value as "ADMIN" | "OFFICER" | "EMPLOYEE")
+              }
+              className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+            >
+              <option value='EMPLOYEE'>Employee</option>
+              <option value='OFFICER'>Officer</option>
+              <option value='ADMIN'>Admin</option>
+            </select>
+          </div>
+
           <div>
             <label className='block text-sm font-medium mb-1'>Status</label>
             <select
