@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { isAuthenticated, logout } from "@/lib/auth";
+import { isAuthenticated } from "@/lib/auth";
 import { deleteUser } from "@/api/auth/users/deleteUser";
 import { updateUser } from "@/api/auth/users/updateUser";
 import AddUserModal from "@/components/users/AddUserModal";
@@ -107,34 +107,6 @@ export default function UsersPage() {
     await Promise.all([fetchUsers(), fetchSummary()]);
   };
 
-  const handleExport = () => {
-    if (users.length === 0) return;
-    const rows = [
-      ["ID", "Name", "Email", "Status", "Created At"].join(","),
-      ...users.map((u) =>
-        [
-          u.id,
-          `"${(u.name || "").replaceAll('"', '""')}"`,
-          `"${u.email.replaceAll('"', '""')}"`,
-          u.is_active ? "Active" : "Inactive",
-          new Date(u.createdAt).toISOString(),
-        ].join(",")
-      ),
-    ];
-    const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `users-page-${page}.csv`;
-    a.click();
-    URL.revokeObjectURL(url);
-  };
-
-  const handleLogout = () => {
-    logout();
-    router.push("/auth/login");
-  };
-
   return (
     <div className="w-full min-h-full space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -146,12 +118,6 @@ export default function UsersPage() {
         </div>
         <div className="flex gap-2">
           <Button onClick={() => setIsAddModalOpen(true)}>+ Add User</Button>
-          <Button variant="outline" onClick={handleExport}>
-            Export
-          </Button>
-          <Button variant="destructive" onClick={handleLogout}>
-            Logout
-          </Button>
         </div>
       </div>
 
