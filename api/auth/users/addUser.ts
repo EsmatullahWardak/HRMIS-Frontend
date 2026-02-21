@@ -11,8 +11,12 @@ export interface User {
 
 export const createUser = async (data: User) => {
   try {
-    console.log(data);
-    const response = await axios.post(`${API_URL}/users`, data);
+    const token = localStorage.getItem("auth_token");
+    const response = await axios.post(`${API_URL}/users`, data, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

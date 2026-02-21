@@ -34,6 +34,7 @@ export default function RootLayout({
 
   const pathname = usePathname();
   const router = useRouter();
+  const isUsersRoute = pathname.startsWith("/users");
 
   // Pages that should NOT show the sidebar
   const authPages = ["/auth/login", "/auth/register"];
@@ -140,7 +141,9 @@ export default function RootLayout({
       >
         {showSidebar ? (
           <SidebarProvider>
-            <div className='flex h-screen w-full max-w-[1400px] mx-auto p-4 gap-4 overflow-hidden'>
+            <div
+              className={`flex h-screen w-full ${isUsersRoute ? "max-w-none" : "max-w-[1400px]"} mx-auto p-4 gap-4 overflow-hidden`}
+            >
               <AppSidebar currentUser={currentUser} onLogout={handleLogout} />
               <main className='flex-1 flex flex-col overflow-hidden bg-card border border-border rounded-2xl shadow-sm'>
                 <header className='border-b border-border p-4 flex items-center justify-between'>

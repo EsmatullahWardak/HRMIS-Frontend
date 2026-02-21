@@ -12,7 +12,12 @@ export interface User {
 
 export const getInactiveUsers = async () => {
   try {
-    const response = await axios.get(`${API_URL}/users/inactive`);
+    const token = localStorage.getItem("auth_token");
+    const response = await axios.get(`${API_URL}/users/inactive`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

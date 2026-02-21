@@ -7,7 +7,12 @@ export const updateUser = async (
   userData: { name: string; email: string; is_active?: boolean }
 ) => {
   try {
-    const response = await axios.put(`${API_URL}/users/${userId}`, userData);
+    const token = localStorage.getItem("auth_token");
+    const response = await axios.put(`${API_URL}/users/${userId}`, userData, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
     return response.data;
   } catch (error) {
     if (axios.isAxiosError(error)) {

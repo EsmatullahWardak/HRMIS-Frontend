@@ -1,55 +1,92 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
-import { isAuthenticated, getUserFromToken, logout } from "@/lib/auth";
-import { getActiveUsers } from "@/api/auth/users/getActiveUsers";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { isAuthenticated, logout } from "@/lib/auth";
 import { deleteUser } from "@/api/auth/users/deleteUser";
-import UsersTable from "@/components/users/UsersTable";
 import { updateUser } from "@/api/auth/users/updateUser";
-import EditUserModal from "@/components/users/EditUserModal";
 import AddUserModal from "@/components/users/AddUserModal";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import EditUserModal from "@/components/users/EditUserModal";
+import {
+  getUsers,
+  getUsersSummary,
+  type User,
+  type UsersSummary,
+} from "@/api/auth/users/getUsers";
 
-interface User {
-  id: number;
-  name: string | null;
-  email: string;
-  createdAt: string;
-  is_active: boolean;
-}
+const PAGE_SIZE = 10;
 
-export default function HomePage() {
-  const [currentUser, setCurrentUser] = useState<any>(null);
+export default function UsersPage() {
+  const router = useRouter();
   const [users, setUsers] = useState<User[]>([]);
+  const [summary, setSummary] = useState<UsersSummary>({
+    total: 0,
+    active: 0,
+    inactive: 0,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [editingUser, setEditingUser] = useState<User | null>(null);
-  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [search, setSearch] = useState("");
+  const [status, setStatus] = useState("");
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const router = useRouter();
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [editingUser, setEditingUser] = useState<User | null>(null);
+
+  const fetchSummary = useCallback(async () => {
+    const data = await getUsersSummary();
+    setSummary(data);
+  }, []);
+
+  const fetchUsers = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await getUsers({
+        page,
+        limit: PAGE_SIZE,
+        search,
+        status,
+      });
+      setUsers(response.data);
+      setTotalPages(Math.max(1, response.meta.totalPages));
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Failed to fetch users";
+      setError(msg);
+    } finally {
+      setLoading(false);
+    }
+  }, [page, search, status]);
 
   useEffect(() => {
     if (!isAuthenticated()) {
       router.push("/auth/login");
       return;
     }
+    void fetchSummary();
+    void fetchUsers();
+  }, [fetchSummary, fetchUsers, router]);
 
-    const tokenData = getUserFromToken();
-    const userData = localStorage.getItem("user");
+  useEffect(() => {
+    setPage(1);
+  }, [search, status]);
 
-    if (tokenData && userData) {
-      setCurrentUser(JSON.parse(userData));
-      fetchUsers();
-    } else {
-      router.push("/auth/login");
+  const filteredCount = useMemo(() => users.length, [users]);
+
+  const handleDeleteUser = async (userId: number) => {
+    if (!confirm("Are you sure you want to delete this user?")) return;
+    try {
+      await deleteUser(userId);
+      await Promise.all([fetchUsers(), fetchSummary()]);
+      alert("User deleted successfully!");
+    } catch (err) {
+      alert(err instanceof Error ? err.message : "Failed to delete user");
     }
-  }, [router]);
-
-  const handleEditUser = (user: User) => {
-    setEditingUser(user);
-    setIsEditModalOpen(true);
   };
 
   const handleSaveUser = async (
@@ -58,52 +95,39 @@ export default function HomePage() {
   ) => {
     try {
       await updateUser(userId, userData);
-      fetchUsers();
+      await Promise.all([fetchUsers(), fetchSummary()]);
       setIsEditModalOpen(false);
       alert("User updated successfully!");
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error ? error.message : "Failed to update user";
-      alert(errorMessage);
-      console.error("Update error:", error);
-    }
-  };
-
-  const handleAddUser = () => {
-    setIsAddModalOpen(true);
-  };
-
-  const handleUserAdded = () => {
-    fetchUsers();
-  };
-
-  const fetchUsers = async () => {
-    try {
-      setLoading(true);
-      const data = await getActiveUsers();
-      setUsers(data);
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to fetch users";
-      setError(msg);
-      console.error("Error fetching users:", err);
-    } finally {
-      setLoading(false);
+      alert(err instanceof Error ? err.message : "Failed to update user");
     }
   };
-  const handleDeleteUser = async (userId: number) => {
-    console.log("Delete button clicked for user:", userId);
-    if (confirm("Are you sure you want to delete this user?")) {
-      try {
-        await deleteUser(userId);
-        fetchUsers();
-        alert("User deleted successfully!");
-      } catch (error) {
-        const errorMessage =
-          error instanceof Error ? error.message : "Failed to delete user";
-        alert(errorMessage);
-        console.error("Delete error:", error);
-      }
-    }
+
+  const handleUserAdded = async () => {
+    await Promise.all([fetchUsers(), fetchSummary()]);
+  };
+
+  const handleExport = () => {
+    if (users.length === 0) return;
+    const rows = [
+      ["ID", "Name", "Email", "Status", "Created At"].join(","),
+      ...users.map((u) =>
+        [
+          u.id,
+          `"${(u.name || "").replaceAll('"', '""')}"`,
+          `"${u.email.replaceAll('"', '""')}"`,
+          u.is_active ? "Active" : "Inactive",
+          new Date(u.createdAt).toISOString(),
+        ].join(",")
+      ),
+    ];
+    const blob = new Blob([rows.join("\n")], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `users-page-${page}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const handleLogout = () => {
@@ -111,74 +135,185 @@ export default function HomePage() {
     router.push("/auth/login");
   };
 
-  if (loading) {
-    return (
-      <div className='flex items-center justify-center min-h-screen bg-background'>
-        <p className='text-lg'>Loading...</p>
-      </div>
-    );
-  }
-
   return (
-    <div className='min-h-screen bg-background p-8'>
-      <div className='max-w-6xl mx-auto'>
-        <div className='flex justify-between items-center mb-8'>
-          <div>
-            <h1 className='text-3xl font-bold text-foreground'>
-              Welcome, {currentUser?.name || "User"}! 👋
-            </h1>
-            <p className='text-muted-foreground mt-1'>
-              Logged in as: {currentUser?.email}
-            </p>
-          </div>
-
-          <Button onClick={handleLogout} variant='destructive'>
+    <div className="w-full min-h-full space-y-6">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight">Users</h1>
+          <p className="text-sm text-muted-foreground">
+            Dynamic employee list with real-time summary and filters.
+          </p>
+        </div>
+        <div className="flex gap-2">
+          <Button onClick={() => setIsAddModalOpen(true)}>+ Add User</Button>
+          <Button variant="outline" onClick={handleExport}>
+            Export
+          </Button>
+          <Button variant="destructive" onClick={handleLogout}>
             Logout
           </Button>
         </div>
-
-        {/* Active Users Cards */}
-        <div className='mb-8'>
-          <h2 className='text-2xl font-bold mb-4 text-green-600'>
-            Active Users ({users.length})
-          </h2>
-          <div className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'>
-            {users.map((user) => (
-              <Card key={user.id}>
-                <CardHeader>
-                  <CardTitle className='text-lg'>
-                    {user.name || "No Name"}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className='text-sm text-muted-foreground'>{user.email}</p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </div>
-
-        <UsersTable
-          users={users}
-          error={error}
-          onDeleteUser={handleDeleteUser}
-          onEditUser={handleEditUser}
-          onAddUser={handleAddUser}
-        />
-
-        <EditUserModal
-          user={editingUser}
-          isOpen={isEditModalOpen}
-          onClose={() => setIsEditModalOpen(false)}
-          onSave={handleSaveUser}
-        />
-
-        <AddUserModal
-          isOpen={isAddModalOpen}
-          onClose={() => setIsAddModalOpen(false)}
-          onUserAdded={handleUserAdded}
-        />
       </div>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <Card>
+          <CardContent className="p-5">
+            <p className="text-sm text-muted-foreground">Total</p>
+            <p className="text-3xl font-semibold">{summary.total}</p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-5">
+            <p className="text-sm text-muted-foreground">Active</p>
+            <p className="text-3xl font-semibold text-emerald-600">
+              {summary.active}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-5">
+            <p className="text-sm text-muted-foreground">Inactive</p>
+            <p className="text-3xl font-semibold text-amber-600">
+              {summary.inactive}
+            </p>
+          </CardContent>
+        </Card>
+        <Card>
+          <CardContent className="p-5">
+            <p className="text-sm text-muted-foreground">Showing (Current Page)</p>
+            <p className="text-3xl font-semibold">{filteredCount}</p>
+          </CardContent>
+        </Card>
+      </div>
+
+      <Card>
+        <CardContent className="p-4 space-y-4">
+          <div className="flex flex-col gap-3 md:flex-row">
+            <Input
+              placeholder="Search by name or email..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="md:max-w-sm"
+            />
+            <select
+              value={status}
+              onChange={(e) => setStatus(e.target.value)}
+              className="h-10 rounded-md border border-input bg-background px-3 text-sm md:w-40"
+            >
+              <option value="">All Statuses</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          {error && (
+            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              {error}
+            </div>
+          )}
+
+          <div className="overflow-x-auto rounded-md border">
+            <table className="min-w-full text-sm">
+              <thead className="bg-muted/40">
+                <tr>
+                  <th className="px-4 py-3 text-left font-semibold">ID</th>
+                  <th className="px-4 py-3 text-left font-semibold">Employee</th>
+                  <th className="px-4 py-3 text-left font-semibold">Email</th>
+                  <th className="px-4 py-3 text-left font-semibold">Status</th>
+                  <th className="px-4 py-3 text-left font-semibold">Created At</th>
+                  <th className="px-4 py-3 text-left font-semibold">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {loading ? (
+                  <tr>
+                    <td className="px-4 py-8 text-center text-muted-foreground" colSpan={6}>
+                      Loading users...
+                    </td>
+                  </tr>
+                ) : users.length === 0 ? (
+                  <tr>
+                    <td className="px-4 py-8 text-center text-muted-foreground" colSpan={6}>
+                      No users found.
+                    </td>
+                  </tr>
+                ) : (
+                  users.map((user) => (
+                    <tr key={user.id} className="border-t">
+                      <td className="px-4 py-3">{user.id}</td>
+                      <td className="px-4 py-3 font-medium">{user.name || "N/A"}</td>
+                      <td className="px-4 py-3">{user.email}</td>
+                      <td className="px-4 py-3">
+                        <Badge variant={user.is_active ? "default" : "secondary"}>
+                          {user.is_active ? "Active" : "Inactive"}
+                        </Badge>
+                      </td>
+                      <td className="px-4 py-3">
+                        {new Date(user.createdAt).toLocaleString()}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2">
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setEditingUser(user);
+                              setIsEditModalOpen(true);
+                            }}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            size="sm"
+                            variant="destructive"
+                            onClick={() => handleDeleteUser(user.id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="flex items-center justify-between">
+            <p className="text-sm text-muted-foreground">
+              Page {page} of {totalPages}
+            </p>
+            <div className="flex gap-2">
+              <Button
+                variant="outline"
+                disabled={page <= 1 || loading}
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+              >
+                Previous
+              </Button>
+              <Button
+                variant="outline"
+                disabled={page >= totalPages || loading}
+                onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+              >
+                Next
+              </Button>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <EditUserModal
+        user={editingUser}
+        isOpen={isEditModalOpen}
+        onClose={() => setIsEditModalOpen(false)}
+        onSave={handleSaveUser}
+      />
+      <AddUserModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onUserAdded={handleUserAdded}
+      />
     </div>
   );
 }
