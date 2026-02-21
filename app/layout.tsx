@@ -28,7 +28,7 @@ export default function RootLayout({
 }>) {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("system");
+  const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
 
@@ -74,8 +74,17 @@ export default function RootLayout({
       | "dark"
       | "system"
       | null;
-    applyTheme(saved ?? "system");
+    applyTheme(saved ?? "light");
   }, []);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("theme") as
+      | "light"
+      | "dark"
+      | "system"
+      | null;
+    applyTheme(saved ?? theme);
+  }, [pathname]);
 
   useEffect(() => {
     const handleStorage = (event: StorageEvent) => {
