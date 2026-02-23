@@ -36,7 +36,7 @@ import {
   LayoutDashboard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import menuItems from "../sidebar/MenuItems";
+import { getMenuItemsByRole } from "../sidebar/MenuItems";
 
 interface AppLayoutProps {
   children: React.ReactNode;
@@ -107,6 +107,8 @@ export function AppSidebar({
   currentUser?: any;
   onLogout?: () => void;
 }) {
+  const menuItems = getMenuItemsByRole(currentUser?.role);
+
   return (
     <Sidebar variant='floating'>
       <SidebarHeader>

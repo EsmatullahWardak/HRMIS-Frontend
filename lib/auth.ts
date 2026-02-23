@@ -3,6 +3,7 @@ import { jwtDecode } from 'jwt-decode';
 interface JWTPayload {
   name: string | null;
   email: string;
+  role?: "ADMIN" | "OFFICER" | "EMPLOYEE";
   iat?: number;
   exp?: number;
 }

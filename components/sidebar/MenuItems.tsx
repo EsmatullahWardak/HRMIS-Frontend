@@ -11,16 +11,37 @@ import {
   Users,
 } from "lucide-react";
 
-const menuItems = [
+export type UserRole = "ADMIN" | "OFFICER" | "EMPLOYEE";
+
+type BaseItem = {
+  title?: string;
+  url?: string;
+  icon: any;
+  roles?: UserRole[];
+  type?: "dropdown";
+  label?: string;
+  items?: Array<{
+    title: string;
+    url: string;
+    icon: any;
+    roles?: UserRole[];
+  }>;
+};
+
+const allRoles: UserRole[] = ["ADMIN", "OFFICER", "EMPLOYEE"];
+
+const menuItems: BaseItem[] = [
   {
     title: "Home",
     url: "/home",
     icon: Home,
+    roles: ["ADMIN", "OFFICER"],
   },
   {
     type: "dropdown",
     label: "Dashboards",
     icon: LayoutDashboard,
+    roles: ["ADMIN", "OFFICER"],
     items: [
       {
         title: "users",
@@ -59,6 +80,7 @@ const menuItems = [
     type: "dropdown",
     label: "Services",
     icon: Settings,
+    roles: allRoles,
     items: [
       {
         title: "Request a Leave",
@@ -87,17 +109,43 @@ const menuItems = [
     title: "My Dashboard",
     url: "/my-dashboard",
     icon: LayoutDashboard,
+    roles: allRoles,
   },
   {
     title: "Feedbacks & Requests",
     url: "/feedbacks",
     icon: FolderOpen,
+    roles: allRoles,
   },
   {
     title: "Change Password",
     url: "/change-password",
     icon: Settings,
+    roles: allRoles,
   },
 ];
+
+export function getMenuItemsByRole(role?: string) {
+  const currentRole = (role as UserRole | undefined) || "OFFICER";
+
+  return menuItems
+    .filter((item) => !item.roles || item.roles.includes(currentRole))
+    .map((item) => {
+      if (item.type !== "dropdown" || !item.items) return item;
+
+      const filteredChildren = item.items.filter(
+        (child) => !child.roles || child.roles.includes(currentRole)
+      );
+
+      return {
+        ...item,
+        items: filteredChildren,
+      };
+    })
+    .filter((item) => {
+      if (item.type !== "dropdown") return true;
+      return !!item.items && item.items.length > 0;
+    });
+}
 
 export default menuItems;

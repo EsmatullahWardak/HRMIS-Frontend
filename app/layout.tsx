@@ -21,6 +21,24 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const canAccessRoute = (role: string | undefined, path: string) => {
+  if (!role || role === "ADMIN" || role === "OFFICER") return true;
+
+  if (role === "EMPLOYEE") {
+    const allowedPrefixes = [
+      "/home",
+      "/services",
+      "/loan-advance",
+      "/my-dashboard",
+      "/feedbacks",
+      "/change-password",
+    ];
+    return allowedPrefixes.some((prefix) => path.startsWith(prefix));
+  }
+
+  return false;
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -48,8 +66,26 @@ export default function RootLayout({
       }
 
       const userData = localStorage.getItem("user");
+      const tokenUser = getUserFromToken();
+
       if (userData) {
-        setCurrentUser(JSON.parse(userData));
+        const parsedUser = JSON.parse(userData);
+        const mergedUser = {
+          ...parsedUser,
+          role: parsedUser.role || tokenUser?.role,
+        };
+        setCurrentUser(mergedUser);
+
+        if (!canAccessRoute(mergedUser.role, pathname)) {
+          router.push("/my-dashboard");
+          return;
+        }
+      } else if (tokenUser) {
+        setCurrentUser(tokenUser);
+        if (!canAccessRoute(tokenUser.role, pathname)) {
+          router.push("/my-dashboard");
+          return;
+        }
       }
     }
     setLoading(false);
