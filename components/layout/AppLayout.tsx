@@ -55,10 +55,27 @@ interface DropdownMenuItemProps {
   }>;
 }
 
+const SIDEBAR_DROPDOWN_STATE_KEY = "sidebar_dropdown_state";
+
 function DropdownMenuItem({ label, icon: Icon, items }: DropdownMenuItemProps) {
   const pathname = usePathname();
   const isChildActive = items.some((item) => pathname === item.url);
-  const [isOpen, setIsOpen] = useState(isChildActive);
+  const [isOpen, setIsOpen] = useState(true);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(SIDEBAR_DROPDOWN_STATE_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      const stored = parsed[label];
+      if (typeof stored === "boolean") {
+        setIsOpen(stored);
+      } else {
+        setIsOpen(true);
+      }
+    } catch {
+      setIsOpen(true);
+    }
+  }, [label]);
 
   useEffect(() => {
     if (isChildActive) {
@@ -66,9 +83,22 @@ function DropdownMenuItem({ label, icon: Icon, items }: DropdownMenuItemProps) {
     }
   }, [pathname, isChildActive]);
 
+  const handleToggle = () => {
+    const next = !isOpen;
+    setIsOpen(next);
+    try {
+      const raw = localStorage.getItem(SIDEBAR_DROPDOWN_STATE_KEY);
+      const parsed = raw ? JSON.parse(raw) : {};
+      parsed[label] = next;
+      localStorage.setItem(SIDEBAR_DROPDOWN_STATE_KEY, JSON.stringify(parsed));
+    } catch {
+      // noop
+    }
+  };
+
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton onClick={() => setIsOpen(!isOpen)}>
+      <SidebarMenuButton onClick={handleToggle}>
         {Icon && <Icon className='h-4 w-4' />}
         <span>{label}</span>
         <ChevronDown
