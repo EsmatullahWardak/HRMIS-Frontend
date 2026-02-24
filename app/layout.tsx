@@ -28,6 +28,10 @@ const canAccessRoute = (role: string | undefined, path: string) => {
     const allowedPrefixes = [
       "/home",
       "/services",
+      "/leave",
+      "/resources",
+      "/dashboard/overtime",
+      "/dashboard/attendance",
       "/loan-advance",
       "/my-dashboard",
       "/feedbacks",
