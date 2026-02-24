@@ -16,6 +16,7 @@ interface UsersTableProps {
   onDeleteUser: (userId: number) => void;
   onEditUser: (user: User) => void;
   onAddUser: () => void;
+  showAddUserButton?: boolean;
 }
 
 export default function UsersTable({
@@ -24,6 +25,7 @@ export default function UsersTable({
   onDeleteUser,
   onEditUser,
   onAddUser,
+  showAddUserButton = true,
 }: UsersTableProps) {
   return (
     <Card>
@@ -41,9 +43,11 @@ export default function UsersTable({
           <p className='text-muted-foreground text-center py-8'>No users found.</p>
         ) : (
           <div className='overflow-x-auto'>
-            <div className='flex justify-end mb-4'>
-              <Button onClick={onAddUser}>+ Add User</Button>
-            </div>
+            {showAddUserButton && (
+              <div className='flex justify-end mb-4'>
+                <Button onClick={onAddUser}>+ Add User</Button>
+              </div>
+            )}
 
             <table className='w-full'>
               <thead>

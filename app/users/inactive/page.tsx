@@ -126,13 +126,13 @@ export default function InactiveUsersPage() {
             </p>
           </div>
 
-          <Button onClick={handleLogout} variant='destructive'>
+          {/* <Button onClick={handleLogout} variant='destructive'>
             Logout
-          </Button>
+          </Button> */}
         </div>
 
         {/* Inactive Users Cards */}
-        <div className='mb-8'>
+        {/* <div className='mb-8'>
           <h2 className='text-2xl font-bold mb-4 text-red-600'>
             Inactive Users ({users.length})
           </h2>
@@ -150,13 +150,15 @@ export default function InactiveUsersPage() {
               </Card>
             ))}
           </div>
-        </div>
+        </div> */}
 
         <UsersTable
           users={users}
           error={error}
           onDeleteUser={handleDeleteUser}
           onEditUser={handleEditUser}
+          onAddUser={() => {}}
+          showAddUserButton={false}
         />
 
         <EditUserModal
