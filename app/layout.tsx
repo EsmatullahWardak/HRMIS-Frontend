@@ -46,13 +46,12 @@ export default function RootLayout({
 }>) {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [theme, setTheme] = useState<"light" | "dark" | "system">("light");
+  const [theme, setTheme] = useState<"light" | "dark">("light");
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
 
 
   const pathname = usePathname();
   const router = useRouter();
-  const isUsersRoute = pathname.startsWith("/users");
 
   // Pages that should NOT show the sidebar
   const authPages = ["/auth/login", "/auth/register"];
@@ -92,61 +91,33 @@ export default function RootLayout({
   }, [pathname, router, showSidebar]);
 
 
-  const applyTheme = (mode: "light" | "dark" | "system") => {
+  const applyTheme = (mode: "light" | "dark") => {
     setTheme(mode);
-    const resolved =
-      mode === "system"
-        ? window.matchMedia("(prefers-color-scheme: dark)").matches
-          ? "dark"
-          : "light"
-        : mode;
-    setResolvedTheme(resolved);
-    document.documentElement.classList.toggle("dark", resolved === "dark");
+    setResolvedTheme(mode);
+    document.documentElement.classList.toggle("dark", mode === "dark");
   };
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme") as
-      | "light"
-      | "dark"
-      | "system"
-      | null;
+    const saved = localStorage.getItem("theme") as "light" | "dark" | null;
     applyTheme(saved ?? "light");
   }, []);
 
   useEffect(() => {
-    const saved = localStorage.getItem("theme") as
-      | "light"
-      | "dark"
-      | "system"
-      | null;
+    const saved = localStorage.getItem("theme") as "light" | "dark" | null;
     applyTheme(saved ?? theme);
   }, [pathname]);
 
   useEffect(() => {
     const handleStorage = (event: StorageEvent) => {
       if (event.key !== "theme") return;
-      const value =
-        (event.newValue as "light" | "dark" | "system" | null) ?? "system";
+      const value = (event.newValue as "light" | "dark" | null) ?? "light";
       applyTheme(value);
     };
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
 
-  useEffect(() => {
-    if (theme !== "system") return;
-    const media = window.matchMedia("(prefers-color-scheme: dark)");
-    const handleChange = () => {
-      const resolved = media.matches ? "dark" : "light";
-      setResolvedTheme(resolved);
-      document.documentElement.classList.toggle("dark", resolved === "dark");
-    };
-    handleChange();
-    media.addEventListener("change", handleChange);
-    return () => media.removeEventListener("change", handleChange);
-  }, [theme]);
-
-  const setThemeMode = (mode: "light" | "dark" | "system") => {
+  const setThemeMode = (mode: "light" | "dark") => {
     localStorage.setItem("theme", mode);
     applyTheme(mode);
   };
@@ -187,10 +158,10 @@ export default function RootLayout({
         {showSidebar ? (
           <SidebarProvider>
             <div
-              className={`flex h-screen w-full ${isUsersRoute ? "max-w-none" : "max-w-[1400px]"} mx-auto p-4 gap-4 overflow-hidden`}
+              className='flex h-screen w-full max-w-[1400px] min-w-0 mx-auto p-4 gap-4 overflow-hidden'
             >
               <AppSidebar currentUser={currentUser} onLogout={handleLogout} />
-              <main className='flex-1 flex flex-col overflow-hidden bg-card border border-border rounded-2xl shadow-sm'>
+              <main className='flex-1 min-w-0 flex flex-col overflow-hidden bg-card border border-border rounded-2xl shadow-sm'>
                 <header className='border-b border-border p-4 flex items-center justify-between'>
                   <SidebarTrigger />
                   <div className='flex items-center gap-4'>
@@ -201,8 +172,6 @@ export default function RootLayout({
                       >
                         {theme === "dark" ? (
                           <Moon className='h-5 w-5' />
-                        ) : theme === "light" ? (
-                          <Sun className='h-5 w-5' />
                         ) : (
                           <Sun className='h-5 w-5' />
                         )}
@@ -219,12 +188,6 @@ export default function RootLayout({
                           className='w-full text-left px-3 py-2 text-sm hover:bg-muted'
                         >
                           Dark
-                        </button>
-                        <button
-                          onClick={() => setThemeMode("system")}
-                          className='w-full text-left px-3 py-2 text-sm hover:bg-muted'
-                        >
-                          System
                         </button>
                       </div>
                     </div>
@@ -254,7 +217,7 @@ export default function RootLayout({
                   </div>
                 </header>
 
-                <div className='flex-1 overflow-auto p-6'>{children}</div>
+                <div className='app-shell-content flex-1 overflow-auto p-6'>{children}</div>
               </main>
             </div>
           </SidebarProvider>

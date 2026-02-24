@@ -120,3 +120,8 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Keep page content dimensions consistent inside the app shell */
+.app-shell-content > .min-h-screen {
+  min-height: 100%;
+}
