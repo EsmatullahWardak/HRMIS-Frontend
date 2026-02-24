@@ -109,14 +109,14 @@ export default function InactiveUsersPage() {
 
   if (loading) {
     return (
-      <div className='flex items-center justify-center min-h-screen bg-background'>
+      <div className='flex items-center justify-center h-full'>
         <p className='text-lg'>Loading...</p>
       </div>
     );
   }
 
   return (
-    <div className='min-h-screen bg-background p-8'>
+    <div className='h-full p-8'>
       <div className='max-w-6xl mx-auto'>
         <div className='flex justify-between items-center mb-8'>
           <div>

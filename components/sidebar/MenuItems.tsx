@@ -35,7 +35,7 @@ const menuItems: BaseItem[] = [
     title: "Home",
     url: "/home",
     icon: Home,
-    roles: ["ADMIN", "OFFICER"],
+    roles: allRoles,
   },
   {
     type: "dropdown",

@@ -8,7 +8,7 @@ export default function ResourcesPage() {
   );
 
   return (
-    <div className='min-h-screen bg-card p-6'>
+    <div className='h-full p-6'>
       {/* Search Bar */}
       <div className='mb-4'>
         <div className='relative'>
