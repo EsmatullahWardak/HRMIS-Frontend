@@ -34,7 +34,7 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [status, setStatus] = useState("");
+  const [status, setStatus] = useState("active");
   const [role, setRole] = useState("");
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -194,9 +194,7 @@ export default function UsersPage() {
               onChange={(e) => setStatus(e.target.value)}
               className="h-10 rounded-md border border-input bg-background px-3 text-sm md:w-40"
             >
-              <option value="">All Statuses</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
+              <option value="active">Active Only</option>
             </select>
             <select
               value={role}
