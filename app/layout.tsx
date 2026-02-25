@@ -53,6 +53,7 @@ export default function RootLayout({
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
   const [pendingLeaveCount, setPendingLeaveCount] = useState(0);
+  const [pendingOvertimeCount, setPendingOvertimeCount] = useState(0);
   const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
 
@@ -126,6 +127,7 @@ export default function RootLayout({
   useEffect(() => {
     if (!showSidebar || currentUser?.role !== "ADMIN") {
       setPendingLeaveCount(0);
+      setPendingOvertimeCount(0);
       return;
     }
 
@@ -134,13 +136,23 @@ export default function RootLayout({
         const token = localStorage.getItem("auth_token");
         if (!token) return;
 
-        const res = await fetch("http://localhost:3001/leave/pending/count", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const [leaveRes, overtimeRes] = await Promise.all([
+          fetch("http://localhost:3001/leave/pending/count", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+          fetch("http://localhost:3001/overtime/pending/count", {
+            headers: { Authorization: `Bearer ${token}` },
+          }),
+        ]);
 
-        if (!res.ok) return;
-        const data = await res.json();
-        setPendingLeaveCount(Number(data?.count || 0));
+        if (leaveRes.ok) {
+          const leaveData = await leaveRes.json();
+          setPendingLeaveCount(Number(leaveData?.count || 0));
+        }
+        if (overtimeRes.ok) {
+          const overtimeData = await overtimeRes.json();
+          setPendingOvertimeCount(Number(overtimeData?.count || 0));
+        }
       } catch {
         // Keep UI stable if API is temporarily unavailable
       }
@@ -237,20 +249,23 @@ export default function RootLayout({
                     <div className='relative'>
                       <button
                         className='relative text-muted-foreground hover:text-foreground transition-colors mr-2'
-                        title={
-                          currentUser?.role === "ADMIN"
-                            ? `${pendingLeaveCount} pending leave request(s)`
-                            : "Notifications"
-                        }
+                      title={
+                        currentUser?.role === "ADMIN"
+                          ? `${pendingLeaveCount + pendingOvertimeCount} pending request(s)`
+                          : "Notifications"
+                      }
                         onClick={(event) => {
                           event.stopPropagation();
                           setIsNotificationOpen((prev) => !prev);
                         }}
                       >
                         <Bell className='h-5 w-5' />
-                        {currentUser?.role === "ADMIN" && pendingLeaveCount > 0 && (
+                        {currentUser?.role === "ADMIN" &&
+                          pendingLeaveCount + pendingOvertimeCount > 0 && (
                           <span className='absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-red-600 text-white text-[11px] leading-5 text-center font-semibold'>
-                            {pendingLeaveCount > 99 ? "99+" : pendingLeaveCount}
+                            {pendingLeaveCount + pendingOvertimeCount > 99
+                              ? "99+"
+                              : pendingLeaveCount + pendingOvertimeCount}
                           </span>
                         )}
                       </button>
@@ -263,14 +278,19 @@ export default function RootLayout({
                           <p className='text-sm font-semibold mb-2'>Notifications</p>
 
                           {currentUser?.role === "ADMIN" ? (
-                            pendingLeaveCount > 0 ? (
+                            pendingLeaveCount + pendingOvertimeCount > 0 ? (
                               <div className='space-y-3'>
                                 <p className='text-sm text-muted-foreground'>
-                                  You have{" "}
+                                  Leave pending:{" "}
                                   <span className='font-semibold text-foreground'>
                                     {pendingLeaveCount}
-                                  </span>{" "}
-                                  pending leave request(s).
+                                  </span>
+                                </p>
+                                <p className='text-sm text-muted-foreground'>
+                                  Overtime pending:{" "}
+                                  <span className='font-semibold text-foreground'>
+                                    {pendingOvertimeCount}
+                                  </span>
                                 </p>
                                 <button
                                   className='w-full rounded-md bg-primary text-primary-foreground text-sm py-2 hover:opacity-90'
@@ -281,10 +301,19 @@ export default function RootLayout({
                                 >
                                   Open Leave Requests
                                 </button>
+                                <button
+                                  className='w-full rounded-md border border-border bg-card text-foreground text-sm py-2 hover:bg-muted'
+                                  onClick={() => {
+                                    setIsNotificationOpen(false);
+                                    router.push("/dashboard/overtime");
+                                  }}
+                                >
+                                  Open Overtime Requests
+                                </button>
                               </div>
                             ) : (
                               <p className='text-sm text-muted-foreground'>
-                                No pending leave requests.
+                                No pending requests.
                               </p>
                             )
                           ) : (
