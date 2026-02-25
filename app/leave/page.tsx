@@ -14,8 +14,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { getToken, getUserFromToken, isAuthenticated } from "@/lib/auth";
+import { useRouter } from "next/navigation";
 
 type LeaveStatus = "Pending" | "Approved" | "Rejected";
+type UserRole = "ADMIN" | "OFFICER" | "EMPLOYEE";
 
 type Leave = {
   id: number;
@@ -32,10 +35,13 @@ type Leave = {
 const API = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:3001";
 
 export default function LeavePage() {
+  const router = useRouter();
+  const [role, setRole] = useState<UserRole>("EMPLOYEE");
   const [leaves, setLeaves] = useState<Leave[]>([]);
   const [loading, setLoading] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [pendingCount, setPendingCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
   const [reportMonth, setReportMonth] = useState(() => {
@@ -48,15 +54,25 @@ export default function LeavePage() {
     startDate: "",
     endDate: "",
     reason: "",
-    userId: "1",
   });
+
+  const authHeaders = () => {
+    const token = getToken();
+    return {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    };
+  };
 
   const fetchLeaves = async () => {
     try {
       setLoading(true);
       setError(null);
 
-      const res = await fetch(`${API}/leave`, { cache: "no-store" });
+      const res = await fetch(`${API}/leave`, {
+        cache: "no-store",
+        headers: authHeaders(),
+      });
       if (!res.ok) throw new Error(await res.text());
 
       const data = await res.json();
@@ -68,9 +84,35 @@ export default function LeavePage() {
     }
   };
 
+  const fetchPendingCount = async () => {
+    if (role !== "ADMIN") return;
+    try {
+      const res = await fetch(`${API}/leave/pending/count`, {
+        headers: authHeaders(),
+      });
+      if (!res.ok) throw new Error(await res.text());
+      const data = await res.json();
+      setPendingCount(data.count ?? 0);
+    } catch {
+      setPendingCount(0);
+    }
+  };
+
   useEffect(() => {
-    fetchLeaves();
-  }, []);
+    if (!isAuthenticated()) {
+      router.push("/auth/login");
+      return;
+    }
+    const user = getUserFromToken();
+    if (user?.role) {
+      setRole(user.role);
+    }
+  }, [router]);
+
+  useEffect(() => {
+    void fetchLeaves();
+    void fetchPendingCount();
+  }, [role]);
 
   const createLeave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -83,13 +125,11 @@ export default function LeavePage() {
         startDate: form.startDate,
         endDate: form.endDate,
         reason: form.reason || undefined,
-        status: "Pending",
-        userId: form.userId ? Number(form.userId) : undefined,
       };
 
       const res = await fetch(`${API}/leave`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify(payload),
       });
 
@@ -100,9 +140,9 @@ export default function LeavePage() {
         startDate: "",
         endDate: "",
         reason: "",
-        userId: "1",
       });
       await fetchLeaves();
+      await fetchPendingCount();
     } catch (e: any) {
       setError(e?.message ?? "Failed to create leave");
     } finally {
@@ -116,12 +156,13 @@ export default function LeavePage() {
 
       const res = await fetch(`${API}/leave/${id}/status`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: authHeaders(),
         body: JSON.stringify({ status }),
       });
 
       if (!res.ok) throw new Error(await res.text());
       await fetchLeaves();
+      await fetchPendingCount();
     } catch (e: any) {
       setError(e?.message ?? "Failed to update status");
     }
@@ -134,19 +175,21 @@ export default function LeavePage() {
 
       if (!reportMonth) throw new Error("Please select report month");
 
-      // Download ALL leaves for the selected month
-      const url = `${API}/leave/report/monthly/export-all?month=${encodeURIComponent(
-        reportMonth,
-      )}`;
+      const url =
+        role === "ADMIN"
+          ? `${API}/leave/report/monthly/export-all?month=${encodeURIComponent(reportMonth)}`
+          : `${API}/leave/report/monthly/export?month=${encodeURIComponent(reportMonth)}`;
 
-      const res = await fetch(url);
+      const res = await fetch(url, { headers: authHeaders() });
       if (!res.ok) throw new Error(await res.text());
 
       const blob = await res.blob();
-
       const a = document.createElement("a");
       a.href = URL.createObjectURL(blob);
-      a.download = `leave-report-${reportMonth}-all-users.csv`;
+      a.download =
+        role === "ADMIN"
+          ? `leave-report-${reportMonth}-all-users.csv`
+          : `leave-report-${reportMonth}-my.csv`;
       document.body.appendChild(a);
       a.click();
       a.remove();
@@ -169,9 +212,22 @@ export default function LeavePage() {
       <div>
         <h1 className='text-2xl font-semibold'>Leave</h1>
         <p className='text-sm text-muted-foreground'>
-          Create and manage leave requests
+          {role === "ADMIN"
+            ? "Review and approve employee leave requests"
+            : "Submit and track your leave requests"}
         </p>
       </div>
+
+      {role === "ADMIN" && (
+        <Card>
+          <CardContent className='pt-6'>
+            <div className='text-sm'>
+              Pending leave requests:{" "}
+              <span className='font-semibold text-amber-600'>{pendingCount}</span>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {error && (
         <div className='rounded-md bg-red-100 px-4 py-2 text-sm text-red-700'>
@@ -179,86 +235,76 @@ export default function LeavePage() {
         </div>
       )}
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Create Leave</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <form
-            onSubmit={createLeave}
-            className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'
-          >
-            <div className='space-y-1'>
-              <Label>Type</Label>
-              <Input
-                placeholder='Sick, Vacation...'
-                value={form.type}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, type: e.target.value }))
-                }
-                required
-              />
-            </div>
+      {role !== "ADMIN" && (
+        <Card>
+          <CardHeader>
+            <CardTitle>Submit Leave Request</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <form
+              onSubmit={createLeave}
+              className='grid gap-4 md:grid-cols-2 lg:grid-cols-3'
+            >
+              <div className='space-y-1'>
+                <Label>Type</Label>
+                <Input
+                  placeholder='Sick, Vacation...'
+                  value={form.type}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, type: e.target.value }))
+                  }
+                  required
+                />
+              </div>
 
-            <div className='space-y-1'>
-              <Label>Start Date</Label>
-              <Input
-                type='date'
-                value={form.startDate}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, startDate: e.target.value }))
-                }
-                required
-              />
-            </div>
+              <div className='space-y-1'>
+                <Label>Start Date</Label>
+                <Input
+                  type='date'
+                  value={form.startDate}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, startDate: e.target.value }))
+                  }
+                  required
+                />
+              </div>
 
-            <div className='space-y-1'>
-              <Label>End Date</Label>
-              <Input
-                type='date'
-                value={form.endDate}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, endDate: e.target.value }))
-                }
-                required
-              />
-            </div>
+              <div className='space-y-1'>
+                <Label>End Date</Label>
+                <Input
+                  type='date'
+                  value={form.endDate}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, endDate: e.target.value }))
+                  }
+                  required
+                />
+              </div>
 
-            <div className='space-y-1 md:col-span-2 lg:col-span-2'>
-              <Label>Reason</Label>
-              <Input
-                placeholder='Optional'
-                value={form.reason}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, reason: e.target.value }))
-                }
-              />
-            </div>
+              <div className='space-y-1 md:col-span-2 lg:col-span-2'>
+                <Label>Reason</Label>
+                <Input
+                  placeholder='Optional'
+                  value={form.reason}
+                  onChange={(e) =>
+                    setForm((f) => ({ ...f, reason: e.target.value }))
+                  }
+                />
+              </div>
 
-            <div className='space-y-1'>
-              <Label>User ID</Label>
-              <Input
-                type='number'
-                min={1}
-                value={form.userId}
-                onChange={(e) =>
-                  setForm((f) => ({ ...f, userId: e.target.value }))
-                }
-              />
-            </div>
-
-            <div className='flex items-end'>
-              <Button type='submit' disabled={submitting}>
-                {submitting ? "Creating..." : "Create"}
-              </Button>
-            </div>
-          </form>
-        </CardContent>
-      </Card>
+              <div className='flex items-end'>
+                <Button type='submit' disabled={submitting}>
+                  {submitting ? "Submitting..." : "Submit Request"}
+                </Button>
+              </div>
+            </form>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-          <CardTitle>All Leaves</CardTitle>
+          <CardTitle>{role === "ADMIN" ? "All Leave Requests" : "My Leave Requests"}</CardTitle>
 
           <div className='flex flex-col gap-2 md:flex-row md:items-center'>
             <div className='flex items-center gap-2'>
@@ -276,7 +322,7 @@ export default function LeavePage() {
               onClick={downloadCsv}
               disabled={downloading}
             >
-              {downloading ? "Downloading..." : "Download Excel (CSV)"}
+              {downloading ? "Downloading..." : "Download CSV"}
             </Button>
 
             {loading && (
@@ -311,7 +357,7 @@ export default function LeavePage() {
                       <TableCell>{l.id}</TableCell>
                       <TableCell>{l.type}</TableCell>
                       <TableCell className='text-xs text-muted-foreground'>
-                        {l.startDate.slice(0, 10)} → {l.endDate.slice(0, 10)}
+                        {l.startDate.slice(0, 10)} {"->"} {l.endDate.slice(0, 10)}
                       </TableCell>
                       <TableCell>{l.reason ?? "-"}</TableCell>
                       <TableCell>
@@ -321,23 +367,31 @@ export default function LeavePage() {
                       </TableCell>
                       <TableCell>{l.userId ?? "-"}</TableCell>
                       <TableCell className='text-right space-x-2'>
-                        <Button
-                          size='sm'
-                          variant='outline'
-                          disabled={l.status !== "Pending"}
-                          onClick={() => updateStatus(l.id, "Approved")}
-                        >
-                          Approve
-                        </Button>
-                        <Button
-                          size='sm'
-                          variant='outline'
-                          className='border-rose-300 text-rose-700 hover:bg-rose-50'
-                          disabled={l.status !== "Pending"}
-                          onClick={() => updateStatus(l.id, "Rejected")}
-                        >
-                          Reject
-                        </Button>
+                        {role === "ADMIN" ? (
+                          <>
+                            <Button
+                              size='sm'
+                              variant='outline'
+                              disabled={l.status !== "Pending"}
+                              onClick={() => updateStatus(l.id, "Approved")}
+                            >
+                              Approve
+                            </Button>
+                            <Button
+                              size='sm'
+                              variant='outline'
+                              className='border-rose-300 text-rose-700 hover:bg-rose-50'
+                              disabled={l.status !== "Pending"}
+                              onClick={() => updateStatus(l.id, "Rejected")}
+                            >
+                              Reject
+                            </Button>
+                          </>
+                        ) : (
+                          <span className='text-xs text-muted-foreground'>
+                            Awaiting admin action
+                          </span>
+                        )}
                       </TableCell>
                     </TableRow>
                   ))}

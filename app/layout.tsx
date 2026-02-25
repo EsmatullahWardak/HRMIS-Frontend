@@ -52,6 +52,8 @@ export default function RootLayout({
   const [loading, setLoading] = useState(true);
   const [theme, setTheme] = useState<"light" | "dark">("light");
   const [resolvedTheme, setResolvedTheme] = useState<"light" | "dark">("light");
+  const [pendingLeaveCount, setPendingLeaveCount] = useState(0);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
 
 
   const pathname = usePathname();
@@ -120,6 +122,42 @@ export default function RootLayout({
     window.addEventListener("storage", handleStorage);
     return () => window.removeEventListener("storage", handleStorage);
   }, []);
+
+  useEffect(() => {
+    if (!showSidebar || currentUser?.role !== "ADMIN") {
+      setPendingLeaveCount(0);
+      return;
+    }
+
+    const fetchPendingCount = async () => {
+      try {
+        const token = localStorage.getItem("auth_token");
+        if (!token) return;
+
+        const res = await fetch("http://localhost:3001/leave/pending/count", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        if (!res.ok) return;
+        const data = await res.json();
+        setPendingLeaveCount(Number(data?.count || 0));
+      } catch {
+        // Keep UI stable if API is temporarily unavailable
+      }
+    };
+
+    fetchPendingCount();
+    const intervalId = setInterval(fetchPendingCount, 10000);
+    return () => clearInterval(intervalId);
+  }, [showSidebar, currentUser?.role, pathname]);
+
+  useEffect(() => {
+    if (!isNotificationOpen) return;
+
+    const handleOutsideClick = () => setIsNotificationOpen(false);
+    document.addEventListener("click", handleOutsideClick);
+    return () => document.removeEventListener("click", handleOutsideClick);
+  }, [isNotificationOpen]);
 
   const setThemeMode = (mode: "light" | "dark") => {
     localStorage.setItem("theme", mode);
@@ -196,9 +234,67 @@ export default function RootLayout({
                       </div>
                     </div>
                     {/* 1. Bell Icon */}
-                    <button className='text-muted-foreground hover:text-foreground transition-colors mr-2'>
-                      <Bell className='h-5 w-5' />
-                    </button>
+                    <div className='relative'>
+                      <button
+                        className='relative text-muted-foreground hover:text-foreground transition-colors mr-2'
+                        title={
+                          currentUser?.role === "ADMIN"
+                            ? `${pendingLeaveCount} pending leave request(s)`
+                            : "Notifications"
+                        }
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          setIsNotificationOpen((prev) => !prev);
+                        }}
+                      >
+                        <Bell className='h-5 w-5' />
+                        {currentUser?.role === "ADMIN" && pendingLeaveCount > 0 && (
+                          <span className='absolute -top-2 -right-2 min-w-5 h-5 px-1 rounded-full bg-red-600 text-white text-[11px] leading-5 text-center font-semibold'>
+                            {pendingLeaveCount > 99 ? "99+" : pendingLeaveCount}
+                          </span>
+                        )}
+                      </button>
+
+                      {isNotificationOpen && (
+                        <div
+                          className='absolute right-0 mt-2 w-72 rounded-lg border border-border bg-card shadow-md z-50 p-3'
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <p className='text-sm font-semibold mb-2'>Notifications</p>
+
+                          {currentUser?.role === "ADMIN" ? (
+                            pendingLeaveCount > 0 ? (
+                              <div className='space-y-3'>
+                                <p className='text-sm text-muted-foreground'>
+                                  You have{" "}
+                                  <span className='font-semibold text-foreground'>
+                                    {pendingLeaveCount}
+                                  </span>{" "}
+                                  pending leave request(s).
+                                </p>
+                                <button
+                                  className='w-full rounded-md bg-primary text-primary-foreground text-sm py-2 hover:opacity-90'
+                                  onClick={() => {
+                                    setIsNotificationOpen(false);
+                                    router.push("/leave");
+                                  }}
+                                >
+                                  Open Leave Requests
+                                </button>
+                              </div>
+                            ) : (
+                              <p className='text-sm text-muted-foreground'>
+                                No pending leave requests.
+                              </p>
+                            )
+                          ) : (
+                            <p className='text-sm text-muted-foreground'>
+                              No new notifications.
+                            </p>
+                          )}
+                        </div>
+                      )}
+                    </div>
 
                     {/* 2. Avatar Circle */}
                     <div className='h-10 w-10 rounded-full bg-indigo-600 text-white flex items-center justify-center font-bold text-lg shadow-sm border-2 border-white'>
