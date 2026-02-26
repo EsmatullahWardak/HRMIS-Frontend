@@ -32,6 +32,7 @@ const canAccessRoute = (role: string | undefined, path: string) => {
       "/resources",
       "/dashboard/overtime",
       "/dashboard/attendance",
+      "/change-shift",
       "/loan-advance",
       "/my-dashboard",
       "/feedbacks",
