@@ -1,7 +1,6 @@
 "use client";
 
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AppSidebar } from "@/components/layout/AppLayout";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -9,17 +8,6 @@ import { useEffect, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { isAuthenticated, getUserFromToken, logout } from "@/lib/auth";
 import { Bell, ChevronDown, Sun, Moon } from "lucide-react";
-
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const canAccessRoute = (role: string | undefined, path: string) => {
   if (!role || role === "ADMIN" || role === "OFFICER") return true;
@@ -191,7 +179,7 @@ export default function RootLayout({
         className={resolvedTheme === "dark" ? "dark" : ""}
       >
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background`}
+          className='antialiased bg-background font-sans'
         >
           <div className='flex items-center justify-center min-h-screen'>
             <p className='text-lg'>Loading...</p>
@@ -208,7 +196,7 @@ export default function RootLayout({
       className={resolvedTheme === "dark" ? "dark" : ""}
     >
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-background`}
+        className='antialiased bg-background font-sans'
       >
         {showSidebar ? (
           <SidebarProvider>
