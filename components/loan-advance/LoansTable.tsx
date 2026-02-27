@@ -6,10 +6,11 @@ interface Loan {
   amount: number;
   remaining: number;
   progress: number;
-  monthly: number;
+  monthlyDeduction: number;
   status: string;
   issuedDate: string;
-  guarantor: string;
+  guarantor: string | null;
+  notes: string | null;
 }
 
 interface LoansTableProps {
@@ -19,7 +20,6 @@ interface LoansTableProps {
 export function LoansTable({ loans }: LoansTableProps) {
   return (
     <div className='mt-6'>
-      {/* Table Header */}
       <div className='grid grid-cols-8 gap-4 text-sm text-muted-foreground border-b pb-3'>
         <div>Loan Type</div>
         <div>Amount</div>
@@ -30,12 +30,8 @@ export function LoansTable({ loans }: LoansTableProps) {
         <div>Guarantor</div>
         <div>Notes</div>
       </div>
-      {/* Table Rows */}
       {loans.map((loan) => (
-        <div
-          key={loan.id}
-          className='grid grid-cols-8 gap-4 py-4 border-b items-center'
-        >
+        <div key={loan.id} className='grid grid-cols-8 gap-4 py-4 border-b items-center'>
           <div>
             <div className='flex items-center gap-2'>
               <Calendar className='h-4 w-4 text-muted-foreground' />
@@ -58,16 +54,18 @@ export function LoansTable({ loans }: LoansTableProps) {
               ></div>
             </div>
           </div>
-          <div className='font-semibold'>${loan.monthly}.00</div>
+          <div className='font-semibold'>${loan.monthlyDeduction}.00</div>
           <div>
             <span className='bg-yellow-100 text-yellow-700 px-2 py-1 rounded-full text-xs'>
-              ⏳ {loan.status}
+              {loan.status}
             </span>
           </div>
-          <div className='text-sm text-muted-foreground'>Issued: {loan.issuedDate}</div>
-          <div className='text-sm text-muted-foreground'>{loan.guarantor}</div>
-          <div className='text-blue-600 text-sm underline cursor-pointer'>
-            View note
+          <div className='text-sm text-muted-foreground'>
+            Issued: {new Date(loan.issuedDate).toLocaleDateString()}
+          </div>
+          <div className='text-sm text-muted-foreground'>{loan.guarantor || "-"}</div>
+          <div className='text-sm text-foreground whitespace-pre-line'>
+            {loan.notes || "-"}
           </div>
         </div>
       ))}

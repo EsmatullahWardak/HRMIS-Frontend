@@ -1,6 +1,7 @@
 interface Employee {
   id: number;
   name: string | null;
+  email: string;
 }
 
 interface LoanForm3MonthProps {
@@ -32,6 +33,7 @@ export function LoanForm3Month({
   selectedMonths,
   onSelectedMonthsChange,
 }: LoanForm3MonthProps) {
+  const selectedGuarantor = employees.find((emp) => emp.email === guarantor);
   const months = [
     "Jan",
     "Feb",
@@ -49,14 +51,15 @@ export function LoanForm3Month({
 
   return (
     <div className='mb-4'>
-      {/* Guarantor Dropdown */}
       <label className='text-sm text-muted-foreground'>Guarantor *</label>
       <div className='relative mt-1'>
         <button
           onClick={onToggleDropdown}
           className='w-full bg-muted border border-border rounded-lg p-3 text-left text-foreground flex justify-between items-center'
         >
-          {guarantor || "Select guarantor (required)"}
+          {selectedGuarantor
+            ? `${selectedGuarantor.name || "No Name"} (${selectedGuarantor.email})`
+            : "Select guarantor (required)"}
           <span className='text-muted-foreground'>▼</span>
         </button>
         {showGuarantorDropdown && (
@@ -72,7 +75,7 @@ export function LoanForm3Month({
             </div>
             {employees
               .filter((emp) =>
-                (emp.name || "")
+                `${emp.name || ""} ${emp.email}`
                   .toLowerCase()
                   .includes(guarantorSearch.toLowerCase())
               )
@@ -80,20 +83,19 @@ export function LoanForm3Month({
                 <button
                   key={emp.id}
                   onClick={() => {
-                    onGuarantorChange(`${emp.name || "No Name"} (${emp.id})`);
+                    onGuarantorChange(emp.email);
                     onCloseDropdown();
                     onGuarantorSearchChange("");
                   }}
                   className='w-full text-left px-4 py-2 hover:bg-muted text-foreground'
                 >
-                  {emp.name || "No Name"} ({emp.id})
+                  {emp.name || "No Name"} ({emp.email})
                 </button>
               ))}
           </div>
         )}
       </div>
 
-      {/* Monthly Deduction */}
       <label className='text-sm text-muted-foreground mt-4 block'>
         Monthly Deduction *
       </label>
@@ -115,7 +117,6 @@ export function LoanForm3Month({
         />
       </div>
 
-      {/* Repayment Months - Select 3 */}
       <label className='text-sm text-muted-foreground mt-4 block'>
         Repayment Months * <span className='text-muted-foreground'>(Select 3)</span>
       </label>
@@ -125,9 +126,7 @@ export function LoanForm3Month({
             key={month}
             onClick={() => {
               if (selectedMonths.includes(month)) {
-                onSelectedMonthsChange(
-                  selectedMonths.filter((m) => m !== month)
-                );
+                onSelectedMonthsChange(selectedMonths.filter((m) => m !== month));
               } else if (selectedMonths.length < 3) {
                 onSelectedMonthsChange([...selectedMonths, month]);
               }
